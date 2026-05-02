@@ -1319,8 +1319,8 @@ const io = new IntersectionObserver(entries => {
 }, {threshold: 0.08});
 document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
 
-/* ── Make webhook ───────────────────────────── */
-const MAKE_URL = 'https://hook.eu1.make.com/bj564jqtw6i7rs7gstrg199m4g5jrwc1';
+/* ── n8n webhook ───────────────────────────── */
+const MAKE_URL = 'https://ianramzay.app.n8n.cloud/webhook/lelelab/new-lead';
 
 function sendToMake(data) {
   return fetch(MAKE_URL, {
