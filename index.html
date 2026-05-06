@@ -874,7 +874,8 @@ footer{
         <p class="card-sub">Познакомься с методикой и преподавателем — без обязательств</p>
         <form id="heroForm" onsubmit="submitForm(event,'heroForm','heroOk')">
           <div class="ff"><label>Твоё имя</label><input type="text" name="name" placeholder="Как тебя зовут?" required></div>
-          <div class="ff"><label>Telegram или Email</label><input type="text" name="contact" placeholder="@username или email@..." required></div>
+          <div class="ff"><label>Telegram</label><input type="text" name="contact" placeholder="@username" required></div>
+          <div class="ff"><label>Email</label><input type="email" name="email" placeholder="your@email.com" required></div>
           <div class="ff">
             <label>Уровень китайского</label>
             <select name="level">
@@ -1225,11 +1226,12 @@ footer{
         <h2>Готов заговорить<br><u>на китайском?</u></h2>
         <p>Оставь контакт — свяжемся и подберём формат под тебя.</p>
         <form id="ctaForm" onsubmit="submitCta(event)" style="max-width:480px;margin:0 auto 24px;display:flex;flex-direction:column;gap:12px">
-          <input type="text" id="ctaContact" placeholder="Telegram @username или email@..."
+          <input type="text" id="ctaContact" placeholder="Telegram @username"
             style="width:100%;padding:15px 20px;border-radius:14px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#fff;font-family:'Inter',sans-serif;font-size:15px;backdrop-filter:blur(12px)"
             required>
-          <input type="email" id="ctaEmail" placeholder="E-mail (необязательно)"
-            style="width:100%;padding:15px 20px;border-radius:14px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#fff;font-family:'Inter',sans-serif;font-size:15px;backdrop-filter:blur(12px)">
+          <input type="email" id="ctaEmail" placeholder="Email"
+            style="width:100%;padding:15px 20px;border-radius:14px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#fff;font-family:'Inter',sans-serif;font-size:15px;backdrop-filter:blur(12px)"
+            required>
           <button type="submit" id="ctaBtn"
             style="width:100%;padding:16px;border-radius:14px;background:#fff;color:#4f46e5;border:none;font-family:'Inter',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .25s">
             Записаться на пробный урок →
