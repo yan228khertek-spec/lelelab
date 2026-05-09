@@ -113,9 +113,10 @@ function buildSubtitle(item) {
 }
 
 // ─── SHARED COMPONENTS ───────────────────────────────────────────
-function Topbar({ streak=7 }) {
+function Topbar({ streak=7, name='' }) {
   return (
-    <div style={{display:'flex',justifyContent:'flex-end',alignItems:'center',padding:'58px 20px 4px'}}>
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'58px 20px 4px'}}>
+      <div style={{fontSize:22,fontWeight:900,color:C.ink,letterSpacing:-0.5,lineHeight:1}}>{name||''}</div>
       <div style={{display:'flex',alignItems:'center',gap:6,background:C.card,padding:'6px 12px',borderRadius:999,fontWeight:800,fontSize:13,color:C.ink}}>
         🔥 <span>{streak} <span style={{color:C.muted,fontWeight:600}}>дней</span></span>
       </div>
@@ -175,7 +176,7 @@ function ProgressScreen({ data }) {
 
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#fff',position:'relative'}}>
-      <Topbar streak={data.streakDays||7} />
+      <Topbar streak={data.streakDays||7} name={data.student?.name||''} />
       <div className="scroll" style={{flex:1,padding:'8px 16px 96px'}}>
 
         {/* ── RING HERO ── */}
@@ -309,7 +310,7 @@ function HistoryScreen({ data }) {
 
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#fff',position:'relative'}}>
-      <Topbar streak={data.streakDays||7}/>
+      <Topbar streak={data.streakDays||7} name={data.student?.name||''}/>
       <div className="scroll" style={{flex:1,padding:'4px 16px 96px'}}>
         <div style={{padding:'4px 4px 12px'}}>
           <div style={{fontSize:22,fontWeight:900,letterSpacing:-0.4,color:C.ink}}>История начислений</div>
@@ -385,7 +386,7 @@ function TopScreen({ data, chatId }) {
 
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#fff',position:'relative'}}>
-      <Topbar streak={data.streakDays||7}/>
+      <Topbar streak={data.streakDays||7} name={data.student?.name||''}/>
       <div className="scroll" style={{flex:1,padding:'4px 16px 96px'}}>
         <div style={{padding:'4px 4px 8px'}}>
           <div style={{fontSize:22,fontWeight:900,letterSpacing:-0.4,color:C.ink}}>Топ учеников</div>
