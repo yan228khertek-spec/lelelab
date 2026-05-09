@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>LELE LAB · 汉分</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body,#root { height:100%; background:#fff; overflow:hidden; }
+  body { font-family: -apple-system,"SF Pro Text",Manrope,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .hz { font-family:"Noto Sans SC","PingFang SC",serif; }
+  .scroll { overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .scroll::-webkit-scrollbar { display:none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React;
+
+// ─── DESIGN TOKENS ───────────────────────────────────────────────
+const C = {
+  bg:'#ffffff', ink:'#1d2347', ink2:'#3a4174', muted:'#8a91b6', line:'#eef0fa', card:'#f7f8ff',
+  teal:'#7df0e0', tealDeep:'#2bb9a6', tealText:'#0f8b7c',
+  blue:'#3b82f6', blueSoft:'#dbe7ff', lilac:'#a3a8ff',
+  gold:'#ffc83d', coral:'#ff7a5b', rose:'#ff6b9d', green:'#22c55e',
+};
+const API = 'https://ianramzay.app.n8n.cloud/webhook';
+
+// ─── LEVELS ──────────────────────────────────────────────────────
+const LEVELS = [
+  { n:1, badge:'🥚', cn:'蛋',   ru:'Новичок',   min:0,    max:300  },
+  { n:2, badge:'🐣', cn:'雏',   ru:'Новенький', min:300,  max:800  },
+  { n:3, badge:'🐥', cn:'学生', ru:'Студент',   min:800,  max:2000 },
+  { n:4, badge:'🦅', cn:'达人', ru:'Мастер',    min:2000, max:5000 },
+  { n:5, badge:'🐉', cn:'大神', ru:'Гуру',      min:5000, max:5000 },
+];
+function getLevel(balance) {
+  for (let i = LEVELS.length-1; i >= 0; i--)
+    if (balance >= LEVELS[i].min) return LEVELS[i];
+  return LEVELS[0];
+}
+
+// ─── HISTORY TYPES ───────────────────────────────────────────────
+const TYPE_MAP = {
+  'Урок':    { vtype:'lesson', ico:'✅' },
+  'ДЗ':      { vtype:'hw',    ico:'📝' },
+  'Тест':    { vtype:'test',  ico:'📋' },
+  'Уровень': { vtype:'level', ico:'🚀' },
+  'Реферал': { vtype:'ref',   ico:'👥' },
+  'HSK':     { vtype:'hsk',   ico:'🎓' },
+};
+const TONE = {
+  lesson:{ bg:'#eafff8', fg:C.tealText },
+  hw:    { bg:'#fff5e6', fg:'#b76d00' },
+  bonus: { bg:'#fff0eb', fg:'#c64a23' },
+  level: { bg:'#ecf0ff', fg:'#3a4490' },
+  test:  { bg:'#f3eaff', fg:'#6c3fb8' },
+  ref:   { bg:'#fff0f5', fg:'#c63a78' },
+  hsk:   { bg:'#fff8e1', fg:'#b8860b' },
+};
+
+// ─── HELPERS ─────────────────────────────────────────────────────
+function relDay(iso) {
+  if (!iso) return '';
+  const diff = Math.floor((Date.now() - new Date(iso)) / 86400000);
+  if (diff === 0) return 'Сегодня';
+  if (diff === 1) return 'Вчера';
+  if (diff < 7)  return `${diff} дня назад`;
+  return new Date(iso).toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
+}
+function relTime(iso) {
+  if (!iso) return '';
+  const d = new Date(new Date(iso).getTime() + 3*3600000);
+  return String(d.getUTCHours()).padStart(2,'0') + ':' + String(d.getUTCMinutes()).padStart(2,'0');
+}
+function fmtPts(pts) { return pts.toLocaleString('ru'); }
+function groupHistory(items) {
+  const map = new Map();
+  for (const it of items) {
+    const k = relDay(it.date);
+    if (!map.has(k)) map.set(k, []);
+    map.get(k).push(it);
+  }
+  return [...map.entries()];
+}
+function buildSubtitle(item) {
+  const c = item.comment || '';
+  if (item.type === 'ДЗ' || item.type === 'Тест') {
+    const m = c.match(/aiScore=(\d+)/);
+    const ot = c.includes('onTime=true');
+    const parts = [];
+    if (m) parts.push(`AI: ${m[1]}/10`);
+    if (ot) parts.push('вовремя');
+    else parts.push('после срока');
+    return parts.join(' · ');
+  }
+  if (item.type === 'Уровень') {
+    const m = c.match(/Достигнут: (.+)/);
+    return m ? `Достигнут уровень ${m[1]}` : '';
+  }
+  if (item.type === 'Реферал') {
+    const m = c.match(/(?:Привёл ученика|Друг оплатил пакет): (.+)/);
+    return m ? m[1] : '';
+  }
+  return '';
+}
+
+// ─── SHARED COMPONENTS ───────────────────────────────────────────
+function Topbar({ streak=7 }) {
+  return (
+    <div style={{display:'flex',justifyContent:'flex-end',alignItems:'center',padding:'58px 20px 4px'}}>
+      <div style={{display:'flex',alignItems:'center',gap:6,background:C.card,padding:'6px 12px',borderRadius:999,fontWeight:800,fontSize:13,color:C.ink}}>
+        🔥 <span>{streak} <span style={{color:C.muted,fontWeight:600}}>дней</span></span>
+      </div>
+    </div>
+  );
+}
+
+function TabBar({ active, onTab }) {
+  const tabs = [['progress','Прогресс'],['history','История'],['top','Топ']];
+  return (
+    <div style={{position:'absolute',left:8,right:8,bottom:14,background:'#fff',border:`1px solid ${C.line}`,borderRadius:24,padding:'8px 6px',display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:4,boxShadow:'0 6px 24px -8px rgba(29,35,71,0.12),0 1px 0 rgba(29,35,71,0.04)',zIndex:100}}>
+      {tabs.map(([k,ru]) => (
+        <div key={k} onClick={()=>onTab(k)} style={{display:'flex',alignItems:'center',justifyContent:'center',padding:'14px 0',borderRadius:18,background:active===k?C.ink:'transparent',color:active===k?'#fff':C.muted,fontSize:13,fontWeight:800,letterSpacing:0.2,cursor:'pointer'}}>
+          {ru}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ActivityRow({ item }) {
+  const { vtype='lesson', ico='✅' } = TYPE_MAP[item.type] || {};
+  const tone = TONE[vtype] || TONE.lesson;
+  const sub = buildSubtitle(item);
+  const timeStr = relTime(item.date);
+  return (
+    <div style={{display:'flex',alignItems:'center',gap:12,background:'#fff',border:`1px solid ${C.line}`,borderRadius:16,padding:'10px 12px'}}>
+      <div style={{width:40,height:40,borderRadius:12,background:tone.bg,color:tone.fg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:20,flexShrink:0}}>{ico}</div>
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontSize:13,fontWeight:800,color:C.ink,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{item.label}</div>
+        <div style={{fontSize:11,color:C.muted,fontWeight:600,marginTop:2}}>{sub || timeStr}</div>
+      </div>
+      <div style={{fontWeight:900,fontSize:15,color:tone.fg,fontVariantNumeric:'tabular-nums',flexShrink:0}}>+{item.points}</div>
+    </div>
+  );
+}
+
+// ─── SCREEN: PROGRESS ────────────────────────────────────────────
+function ProgressScreen({ data }) {
+  const s = data.student;
+  const lvl = getLevel(s.balance);
+  const nextLvl = lvl.n < 5 ? LEVELS[lvl.n] : null;
+  const pct = lvl.n===5 ? 100 : Math.round((s.balance-lvl.min)/(lvl.max-lvl.min)*100);
+  const R=78, C0=2*Math.PI*R, dash=C0*(pct/100);
+
+  const discountTiers = [
+    {v:1000,p:'3%',  got: s.balance>=1000},
+    {v:3000,p:'5%',  got: s.balance>=3000},
+    {v:7000,p:'7%',  got: s.balance>=7000},
+    {v:12000,p:'10%',got: s.balance>=12000},
+  ];
+  const currentDiscount = discountTiers.findIndex(d=>!d.got);
+
+  const tg = window.Telegram?.WebApp;
+  const chatId = tg?.initDataUnsafe?.user?.id;
+  const refLink = chatId ? `https://t.me/lelestudentbot?start=ref_${chatId}` : null;
+
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#fff',position:'relative'}}>
+      <Topbar streak={data.streakDays||7} />
+      <div className="scroll" style={{flex:1,padding:'8px 16px 96px'}}>
+
+        {/* ── RING HERO ── */}
+        <div style={{background:'#fff',border:`1px solid ${C.line}`,borderRadius:28,padding:'22px 16px 18px',display:'flex',alignItems:'center',gap:18,boxShadow:'0 4px 18px -10px rgba(29,35,71,0.12)'}}>
+          <div style={{position:'relative',width:172,height:172,flexShrink:0}}>
+            <svg width="172" height="172" viewBox="-86 -86 172 172">
+              <circle r={R} fill="none" stroke={C.line} strokeWidth="14"/>
+              <circle r={R} fill="none" stroke="url(#ring)" strokeWidth="14"
+                strokeLinecap="round"
+                strokeDasharray={`${dash} ${C0}`}
+                transform="rotate(-90)"/>
+              <defs>
+                <linearGradient id="ring" x1="-1" y1="-1" x2="1" y2="1">
+                  <stop offset="0" stopColor={C.teal}/>
+                  <stop offset="1" stopColor={C.ink}/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
+              <span style={{fontSize:11,color:C.muted,fontWeight:700,letterSpacing:1,textTransform:'uppercase'}}>Баланс</span>
+              <span style={{fontWeight:900,fontSize:34,color:C.ink,letterSpacing:-1,lineHeight:1,fontVariantNumeric:'tabular-nums'}}>{fmtPts(s.balance)}</span>
+              <span className="hz" style={{fontSize:14,color:C.tealText,fontWeight:800,marginTop:2}}>汉分</span>
+            </div>
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{display:'inline-flex',alignItems:'center',gap:6,background:C.card,borderRadius:999,padding:'5px 10px',fontWeight:800,fontSize:12,color:C.ink}}>
+              {lvl.badge} <span className="hz">{lvl.cn}</span> · LVL {lvl.n}
+            </div>
+            {nextLvl && (
+              <div style={{marginTop:10,fontSize:13,color:C.muted,lineHeight:1.4}}>
+                До <b style={{color:C.ink}}><span className="hz">{nextLvl.cn}</span> {nextLvl.badge}</b> ещё{' '}
+                <b style={{color:C.ink,fontVariantNumeric:'tabular-nums'}}>{fmtPts(s.pointsToNext)}</b> 汉分
+              </div>
+            )}
+            <div style={{marginTop:14,display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+              <div style={{display:'flex',flexDirection:'column',gap:2}}>
+                <span style={{fontSize:11,fontWeight:700,letterSpacing:0.6,textTransform:'uppercase',color:C.muted}}>Скидка</span>
+                <span style={{fontSize:18,fontWeight:800,color:s.discount>0?C.tealText:C.muted,fontVariantNumeric:'tabular-nums'}}>{s.discount>0?`${s.discount}%`:'—'}</span>
+              </div>
+              <div style={{display:'flex',flexDirection:'column',gap:2}}>
+                <span style={{fontSize:11,fontWeight:700,letterSpacing:0.6,textTransform:'uppercase',color:C.muted}}>Место в топе</span>
+                <span style={{fontSize:18,fontWeight:800,color:C.ink,fontVariantNumeric:'tabular-nums'}}>
+                  {data.leaderboard?.myRank ? `#${data.leaderboard.myRank}` : '—'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── QUICK ACTIONS ── */}
+        <div style={{marginTop:14,display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
+          {[
+            {ico:'📝',t:'Сдать ДЗ',sub:'+30…+75',accent:C.teal,action:()=>tg?.openTelegramLink?.('https://t.me/lelehwbot')},
+            {ico:'👥',t:'Приведи друга',sub:'+1 000 汉分',accent:C.lilac,action:()=>refLink&&tg?.shareURL?.(refLink,'Учи китайский со мной в LELE LAB! 🐉')},
+            {ico:'🎓',t:'HSK',sub:'+уровень×300',accent:C.gold,action:null},
+          ].map((a,i)=>(
+            <div key={i} onClick={a.action||undefined} style={{background:C.card,borderRadius:18,padding:'12px 10px',borderLeft:`3px solid ${a.accent}`,cursor:a.action?'pointer':'default'}}>
+              <div style={{fontSize:20}}>{a.ico}</div>
+              <div style={{fontSize:13,fontWeight:800,color:C.ink,marginTop:6}}>{a.t}</div>
+              <div style={{fontSize:10,color:C.muted,fontWeight:700,marginTop:2}}>{a.sub}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* ── LEVEL RAIL ── */}
+        <div style={{marginTop:18}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10,padding:'0 4px'}}>
+            <span style={{fontWeight:800,fontSize:14,color:C.ink}}>Путь уровней</span>
+            <span style={{fontSize:12,color:C.muted,fontWeight:700}}>5 ступеней</span>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:6}}>
+            {LEVELS.map(l=>{
+              const reached = s.balance >= l.min;
+              const cur = l.n === lvl.n;
+              return (
+                <div key={l.n} style={{background:cur?C.ink:reached?C.card:'#fff',border:cur?'none':`1px solid ${reached?C.teal:C.line}`,borderRadius:14,padding:'10px 4px 8px',textAlign:'center',color:cur?'#fff':reached?C.ink:C.muted}}>
+                  <div style={{fontSize:22,lineHeight:1}}>{l.badge}</div>
+                  <div className="hz" style={{fontSize:12,fontWeight:800,marginTop:4}}>{l.cn}</div>
+                  <div style={{fontSize:9,marginTop:2,fontWeight:700,color:cur?C.teal:reached?C.tealText:C.muted,fontVariantNumeric:'tabular-nums'}}>{l.min.toLocaleString('ru')}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── DISCOUNT TIERS ── */}
+        <div style={{marginTop:18}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10,padding:'0 4px'}}>
+            <span style={{fontWeight:800,fontSize:14,color:C.ink}}>Твоя скидка на пакеты</span>
+            <span style={{fontSize:12,color:C.tealText,fontWeight:800}}>{s.discount>0?`сейчас ${s.discount}%`:'нет скидки'}</span>
+          </div>
+          <div style={{display:'flex',gap:8}}>
+            {discountTiers.map((d,i)=>{
+              const isCurrent = !d.got && (i===0 || discountTiers[i-1].got);
+              return (
+                <div key={i} style={{flex:1,background:d.got?C.teal:isCurrent?'#fff':C.card,border:isCurrent?`2px dashed ${C.ink}`:`1px solid ${d.got?'transparent':C.line}`,borderRadius:14,padding:'10px 4px',textAlign:'center',color:d.got?C.ink:isCurrent?C.ink:C.muted}}>
+                  <div style={{fontWeight:900,fontSize:18}}>{d.p}</div>
+                  <div style={{fontSize:10,marginTop:2,fontWeight:700,fontVariantNumeric:'tabular-nums'}}>{fmtPts(d.v)}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── RECENT ── */}
+        {data.history?.length > 0 && (
+          <div style={{marginTop:18}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8,padding:'0 4px'}}>
+              <span style={{fontWeight:800,fontSize:14,color:C.ink}}>Последние начисления</span>
+            </div>
+            <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              {data.history.slice(0,3).map((it,i)=><ActivityRow key={i} item={it}/>)}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN: HISTORY ─────────────────────────────────────────────
+const FILTERS = ['Всё','Уроки','ДЗ','Тесты','Уровни','Рефералы'];
+const FILTER_TYPES = { 'Уроки':'Урок','ДЗ':'ДЗ','Тесты':'Тест','Уровни':'Уровень','Рефералы':'Реферал' };
+
+function HistoryScreen({ data }) {
+  const [filter, setFilter] = useState('Всё');
+  const items = data.history || [];
+  const weekTotal = items.reduce((a,b)=>a+b.points,0);
+  const filtered = filter==='Всё' ? items : items.filter(it=>it.type===FILTER_TYPES[filter]);
+  const groups = groupHistory(filtered);
+
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#fff',position:'relative'}}>
+      <Topbar streak={data.streakDays||7}/>
+      <div className="scroll" style={{flex:1,padding:'4px 16px 96px'}}>
+        <div style={{padding:'4px 4px 12px'}}>
+          <div style={{fontSize:22,fontWeight:900,letterSpacing:-0.4,color:C.ink}}>История начислений</div>
+          <div style={{fontSize:13,color:C.muted,fontWeight:700,marginTop:2}}>
+            За неделю <span style={{color:C.tealText,fontWeight:900}}>+{fmtPts(weekTotal)} 汉分</span>
+          </div>
+        </div>
+
+        {/* filters */}
+        <div style={{display:'flex',gap:6,paddingBottom:14,overflowX:'auto',WebkitOverflowScrolling:'touch',scrollbarWidth:'none'}}>
+          {FILTERS.map(f=>(
+            <div key={f} onClick={()=>setFilter(f)} style={{padding:'6px 12px',borderRadius:999,background:filter===f?C.ink:C.card,color:filter===f?'#fff':C.ink2,fontSize:12,fontWeight:800,whiteSpace:'nowrap',border:filter===f?'none':`1px solid ${C.line}`,cursor:'pointer',flexShrink:0}}>
+              {f}
+            </div>
+          ))}
+        </div>
+
+        {/* grouped list */}
+        {groups.length===0 && (
+          <div style={{textAlign:'center',color:C.muted,padding:'40px 0',fontSize:14}}>Начислений нет 🌱</div>
+        )}
+        <div style={{display:'flex',flexDirection:'column',gap:14}}>
+          {groups.map(([day, rows])=>(
+            <div key={day}>
+              <div style={{fontSize:11,color:C.muted,fontWeight:800,letterSpacing:1,textTransform:'uppercase',padding:'0 4px 6px'}}>{day}</div>
+              <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                {rows.map((it,i)=><ActivityRow key={i} item={it}/>)}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN: LEADERBOARD ─────────────────────────────────────────
+function TopScreen({ data, chatId }) {
+  const [mode, setMode] = useState('weekly');
+  const [lbData, setLbData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const fetched = useRef(false);
+
+  useEffect(()=>{
+    if (fetched.current) return;
+    fetched.current = true;
+    setLoading(true);
+    fetch(`${API}/lelelab/hanfen-leaderboard?chatId=${chatId||0}`)
+      .then(r=>r.json())
+      .then(d=>{ if(d.ok) setLbData(d); })
+      .catch(()=>{})
+      .finally(()=>setLoading(false));
+  },[chatId]);
+
+  const generalTop = lbData?.general?.top10 || data.leaderboard?.top10 || [];
+  const weeklyTop  = lbData?.weekly?.top10  || [];
+  const list       = mode==='weekly' ? weeklyTop : generalTop;
+  const myRankGen  = lbData?.general?.myRank  || data.leaderboard?.myRank;
+  const myRankWeek = lbData?.weekly?.myRank;
+  const myRank     = mode==='weekly' ? myRankWeek : myRankGen;
+  const myScore    = mode==='weekly' ? lbData?.weekly?.myPoints : data.leaderboard?.myBalance;
+  const weekLabel  = lbData?.weekly?.weekLabel || '';
+  const total      = lbData ? lbData.general?.top10?.length || 0 : generalTop.length;
+
+  const podium = [list[1],list[0],list[2]]; // 2-1-3
+  const podiumCfg = [
+    {h:96,  medal:'🥈', clr:'#cfd5e8'},
+    {h:128, medal:'🥇', clr:C.gold},
+    {h:74,  medal:'🥉', clr:'#e6a472'},
+  ];
+
+  const myName = data.student?.name || '';
+
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',background:'#fff',position:'relative'}}>
+      <Topbar streak={data.streakDays||7}/>
+      <div className="scroll" style={{flex:1,padding:'4px 16px 96px'}}>
+        <div style={{padding:'4px 4px 8px'}}>
+          <div style={{fontSize:22,fontWeight:900,letterSpacing:-0.4,color:C.ink}}>Топ учеников</div>
+          <div style={{fontSize:13,color:C.muted,fontWeight:700,marginTop:2}}>
+            {loading ? 'Загружаем…' : `${total} учеников · обновлено только что`}
+          </div>
+        </div>
+
+        {/* segmented */}
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:0,background:C.card,borderRadius:14,padding:4,marginBottom:14}}>
+          {['weekly','general'].map((m,i)=>(
+            <div key={m} onClick={()=>setMode(m)} style={{padding:'8px 0',textAlign:'center',borderRadius:11,background:mode===m?C.ink:'transparent',color:mode===m?'#fff':C.muted,fontWeight:800,fontSize:13,cursor:'pointer'}}>
+              {m==='weekly'?'Эта неделя':'Всё время'}
+            </div>
+          ))}
+        </div>
+
+        {mode==='weekly' && weekLabel && (
+          <div style={{fontSize:11,color:C.muted,textAlign:'center',marginBottom:10,fontWeight:700}}>{weekLabel}</div>
+        )}
+
+        {/* podium */}
+        {list.length >= 3 && (
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1.2fr 1fr',gap:8,alignItems:'end',marginBottom:16}}>
+            {podium.map((p,i)=>{
+              if (!p) return <div key={i}/>;
+              const cfg = podiumCfg[i];
+              const score = mode==='weekly' ? p.weekPoints : p.balance;
+              const isMe = p.name === myName;
+              return (
+                <div key={i} style={{textAlign:'center'}}>
+                  <div style={{fontSize:28,lineHeight:1}}>{cfg.medal}</div>
+                  <div style={{fontSize:11,fontWeight:800,color:C.ink,marginTop:6,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.name}</div>
+                  <div style={{fontSize:11,color:C.tealText,fontWeight:800,fontVariantNumeric:'tabular-nums'}}>+{fmtPts(score||0)}</div>
+                  <div style={{marginTop:8,height:cfg.h,background:`linear-gradient(180deg, ${cfg.clr}, ${C.card})`,borderRadius:'14px 14px 6px 6px',border:`1px solid ${C.line}`,display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:8,fontWeight:900,fontSize:18,color:C.ink}}>
+                    #{p.rank}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ranked list (4+) */}
+        <div style={{display:'flex',flexDirection:'column',gap:6}}>
+          {list.slice(3).map(r=>{
+            const isMe = r.name === myName;
+            const score = mode==='weekly' ? r.weekPoints : r.balance;
+            const lvl = getLevel(mode==='weekly' ? (data.leaderboard?.myBalance||0) : r.balance);
+            return (
+              <div key={r.rank} style={{display:'flex',alignItems:'center',gap:12,background:isMe?C.ink:'#fff',border:`1px solid ${isMe?C.ink:C.line}`,borderRadius:14,padding:'10px 12px',color:isMe?'#fff':C.ink}}>
+                <div style={{width:30,textAlign:'center',fontWeight:900,fontSize:13,color:isMe?C.teal:C.muted,fontVariantNumeric:'tabular-nums'}}>#{r.rank}</div>
+                <div style={{width:34,height:34,borderRadius:11,background:isMe?'rgba(125,240,224,0.2)':C.card,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16}}>
+                  {lvl.badge}
+                </div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:13,fontWeight:800,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>
+                    {r.name}{isMe && <span style={{color:C.teal,marginLeft:6}}>· ты</span>}
+                  </div>
+                  <div style={{fontSize:10,color:isMe?'rgba(255,255,255,0.6)':C.muted,fontWeight:700,marginTop:1}}>
+                    <span className="hz">{lvl.cn}</span>
+                  </div>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <div style={{fontWeight:900,fontSize:14,fontVariantNumeric:'tabular-nums'}}>{fmtPts(score||0)}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* my rank footer if not in top */}
+        {myRank && myRank > 10 && (
+          <div style={{marginTop:12,display:'flex',alignItems:'center',justifyContent:'space-between',background:C.ink,borderRadius:14,padding:'10px 14px',color:'#fff',fontSize:13}}>
+            <span>Твоё место</span>
+            <b style={{color:C.teal,fontSize:16}}>#{myRank}</b>
+            <span style={{fontVariantNumeric:'tabular-nums'}}>{fmtPts(myScore||0)} {mode==='weekly'?'за нед.':'汉分'}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── LOADING / ERROR ─────────────────────────────────────────────
+function Spinner() {
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#fff',gap:12}}>
+      <div style={{width:36,height:36,border:`3px solid ${C.line}`,borderTopColor:C.teal,borderRadius:'50%',animation:'spin 0.8s linear infinite'}}/>
+      <div style={{fontSize:14,color:C.muted,fontWeight:700}}>Загружаем…</div>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  );
+}
+function ErrorScreen({ msg }) {
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'#fff',gap:8,padding:32}}>
+      <div style={{fontSize:48}}>😕</div>
+      <div style={{fontSize:16,fontWeight:800,color:C.ink,textAlign:'center'}}>{msg}</div>
+      <div style={{fontSize:13,color:C.muted,textAlign:'center'}}>Открой через @lelestudentbot</div>
+    </div>
+  );
+}
+
+// ─── APP ─────────────────────────────────────────────────────────
+function App() {
+  const [tab, setTab]   = useState('progress');
+  const [data, setData] = useState(null);
+  const [err, setErr]   = useState(null);
+
+  const tg     = window.Telegram?.WebApp;
+  const chatId = tg?.initDataUnsafe?.user?.id || null;
+
+  useEffect(()=>{
+    if (tg) { tg.ready(); tg.expand(); }
+
+    if (!chatId) {
+      // Dev mode: load mock data
+      setData({
+        ok: true,
+        streakDays: 7,
+        student: { name:'Демо', balance:2380, level:4, levelText:'🦅 达人', progressPct:13, pointsToNext:2620, discount:3, nextLevelText:'🐉 大神' },
+        history: [
+          { label:'Урок +50 汉分', type:'Урок', points:50, date:new Date().toISOString(), comment:'' },
+          { label:'ДЗ +65 汉分', type:'ДЗ', points:65, date:new Date(Date.now()-86400000).toISOString(), comment:'aiScore=8 onTime=true' },
+          { label:'Новый уровень +200 汉分', type:'Уровень', points:200, date:new Date(Date.now()-2*86400000).toISOString(), comment:'Достигнут: 🦅 达人' },
+        ],
+        leaderboard: {
+          top10:[
+            {rank:1,name:'@anya_w',  balance:7820},
+            {rank:2,name:'@maks_lin',balance:5210},
+            {rank:3,name:'@yulya_z', balance:2410},
+            {rank:4,name:'Демо',     balance:2380},
+            {rank:5,name:'@dasha',   balance:2120},
+          ],
+          myRank:4, myBalance:2380
+        }
+      });
+      return;
+    }
+
+    fetch(`${API}/lelelab/hanfen-api?chatId=${chatId}`)
+      .then(r=>r.json())
+      .then(d=>{ if(d.ok) setData(d); else setErr('Ученик не найден'); })
+      .catch(()=>setErr('Ошибка соединения'));
+  },[]);
+
+  if (err)   return <ErrorScreen msg={err}/>;
+  if (!data) return <Spinner/>;
+
+  return (
+    <div style={{height:'100%',position:'relative',background:'#fff'}}>
+      {tab==='progress' && <ProgressScreen data={data}/>}
+      {tab==='history'  && <HistoryScreen  data={data}/>}
+      {tab==='top'      && <TopScreen      data={data} chatId={chatId}/>}
+      <TabBar active={tab} onTab={setTab}/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
