@@ -321,6 +321,28 @@
   .footer-links a { color: var(--muted); text-decoration: none; }
   .footer-links a:hover { color: var(--text); }
 
+  /* ── FILE DROP ── */
+  .file-drop {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 18px; border-radius: 10px; cursor: pointer;
+    border: 1.5px dashed rgba(99,102,241,0.35);
+    background: rgba(99,102,241,0.04);
+    font-size: 0.88rem; color: var(--muted);
+    transition: border-color 0.2s, background 0.2s;
+    user-select: none;
+  }
+  .file-drop:hover, .file-drop.dragover {
+    border-color: rgba(99,102,241,0.7);
+    background: rgba(99,102,241,0.08);
+    color: var(--text);
+  }
+  .file-drop.has-file {
+    border-color: rgba(34,211,238,0.5);
+    background: rgba(34,211,238,0.05);
+    color: var(--p3);
+  }
+  .file-icon { font-size: 1.2rem; flex-shrink: 0; }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 640px) {
     .nav { padding: 14px 20px; }
@@ -612,14 +634,13 @@
             <textarea id="f-about" placeholder="Почему хочешь преподавать в LELE LAB, какой формат предпочитаешь, любые детали"></textarea>
           </div>
 
-          <div class="form-email-hint">
-            <span class="icon">📎</span>
-            <span>
-              Прикрепи резюме или портфолио и отправь на
-              <a href="mailto:yan228.khertek@gmail.com?subject=Заявка преподавателя LELE LAB">yan228.khertek@gmail.com</a>
-              — тема письма: <strong>«Заявка преподавателя LELE LAB»</strong>.
-              Это ускорит рассмотрение.
-            </span>
+          <div class="form-group full">
+            <label>Резюме <span style="color:var(--muted);font-weight:400;">(необязательно · PDF, DOC, DOCX до 20 МБ)</span></label>
+            <div class="file-drop" id="fileDrop">
+              <span class="file-icon">📎</span>
+              <span id="fileLabel">Нажми или перетащи файл сюда</span>
+              <input type="file" id="f-cv" accept=".pdf,.doc,.docx" style="display:none;">
+            </div>
           </div>
 
           <div id="formMsg" class="form-msg"></div>
@@ -661,6 +682,38 @@
   const BOT_TOKEN = '8620946003:AAGwXF1clHi2KJbM5DSQ_mNfBX-V7wAEv8w';
   const CHAT_ID   = '1291657098';
 
+  // ── File drop zone ──
+  const fileDrop  = document.getElementById('fileDrop');
+  const fileInput = document.getElementById('f-cv');
+  const fileLabel = document.getElementById('fileLabel');
+
+  fileDrop.addEventListener('click', () => fileInput.click());
+
+  fileDrop.addEventListener('dragover', e => { e.preventDefault(); fileDrop.classList.add('dragover'); });
+  fileDrop.addEventListener('dragleave', () => fileDrop.classList.remove('dragover'));
+  fileDrop.addEventListener('drop', e => {
+    e.preventDefault();
+    fileDrop.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) setFile(file);
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) setFile(fileInput.files[0]);
+  });
+
+  function setFile(file) {
+    // Put dropped file back into the input via DataTransfer
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    fileInput.files = dt.files;
+
+    const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+    fileLabel.textContent = `${file.name} · ${sizeMB} МБ`;
+    fileDrop.classList.add('has-file');
+  }
+
+  // ── Form submit ──
   document.getElementById('applyForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -669,6 +722,7 @@
     const level = document.getElementById('f-level').value;
     const exp   = document.getElementById('f-exp').value || 'не указан';
     const about = document.getElementById('f-about').value.trim() || '—';
+    const cvFile = fileInput.files[0] || null;
 
     const btn = document.getElementById('submitBtn');
     const msg = document.getElementById('formMsg');
@@ -683,36 +737,50 @@
       `📱 <b>Telegram:</b> ${tg}\n` +
       `🇨🇳 <b>Уровень китайского:</b> ${level}\n` +
       `🏫 <b>Опыт преподавания:</b> ${exp}\n` +
-      `📝 <b>О себе:</b> ${about}\n\n` +
+      `📝 <b>О себе:</b> ${about}\n` +
+      `📎 <b>Резюме:</b> ${cvFile ? cvFile.name : 'не прикреплено'}\n\n` +
       `🔗 Источник: lelelab.ru/fortutors`;
 
     try {
+      // 1. Send text message
       const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: 'HTML' })
       });
       const data = await res.json();
+      if (!data.ok) throw new Error(data.description || 'Telegram error');
 
-      if (data.ok) {
-        msg.className = 'form-msg success';
-        msg.textContent = '✓ Заявка отправлена! Мы рассмотрим её в течение 3 рабочих дней и напишем тебе в Telegram.';
-        msg.style.display = 'block';
-        document.getElementById('applyForm').reset();
-        btn.textContent = '✓ Отправлено';
-      } else {
-        throw new Error(data.description || 'Telegram error');
+      // 2. Send CV file if attached
+      if (cvFile) {
+        const fd = new FormData();
+        fd.append('chat_id', CHAT_ID);
+        fd.append('document', cvFile, cvFile.name);
+        fd.append('caption', `📎 Резюме от ${name} (${tg})`);
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+          method: 'POST',
+          body: fd
+        });
       }
+
+      msg.className = 'form-msg success';
+      msg.textContent = '✓ Заявка отправлена! Мы рассмотрим её в течение 3 рабочих дней и напишем тебе в Telegram.';
+      msg.style.display = 'block';
+      document.getElementById('applyForm').reset();
+      fileLabel.textContent = 'Нажми или перетащи файл сюда';
+      fileDrop.classList.remove('has-file');
+      btn.textContent = '✓ Отправлено';
+
     } catch (err) {
       msg.className = 'form-msg error';
-      msg.textContent = '✗ Не удалось отправить. Напиши нам напрямую: @leleikaa в Telegram.';
+      msg.textContent = '✗ Не удалось отправить. Напиши нам напрямую: @neleika в Telegram.';
       msg.style.display = 'block';
       btn.disabled = false;
       btn.textContent = '✦ Отправить заявку';
     }
   });
 
-  // Smooth scroll for anchor links
+  // Smooth scroll
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', e => {
       e.preventDefault();
