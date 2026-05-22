@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LELE LAB — Стать преподавателем</title>
+<meta name="description" content="LELE LAB ищет преподавателей китайского языка. EdTech-школа нового поколения: Telegram Mini App, AI-боты, система 汉分.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:   #020617;
+    --bg2:  #0a0f1e;
+    --p1:   #6366f1;
+    --p2:   #3b82f6;
+    --p3:   #22d3ee;
+    --text: #f1f5f9;
+    --muted:#94a3b8;
+    --border: rgba(99,102,241,0.2);
+    --glass:  rgba(15,23,42,0.7);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  .grad-text {
+    background: linear-gradient(135deg, var(--p1), var(--p2), var(--p3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 0 32px; }
+  .section    { padding: 72px 0; }
+  .divider    { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 0 32px; }
+
+  /* ── ORB GLOWS ── */
+  .orb { position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.16; pointer-events: none; z-index: 0; }
+  .orb-1 { width: 600px; height: 600px; background: var(--p1); top: -200px; right: -200px; }
+  .orb-2 { width: 500px; height: 500px; background: var(--p3); bottom: 100px; left: -200px; }
+
+  /* ── NAV ── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    padding: 16px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(2,6,23,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-size: 1.1rem; font-weight: 800; letter-spacing: -0.01em; }
+  .nav-link {
+    font-size: 0.82rem; font-weight: 500; color: var(--muted);
+    text-decoration: none; padding: 8px 16px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: rgba(99,102,241,0.06);
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .nav-link:hover { color: var(--text); border-color: rgba(99,102,241,0.5); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    padding: 96px 0 80px;
+    text-align: center;
+    overflow: hidden;
+  }
+  .hero-bg-char {
+    position: absolute; font-size: 420px; font-weight: 900;
+    color: var(--p1); opacity: 0.04;
+    top: 50%; left: 50%; transform: translate(-50%, -52%);
+    line-height: 1; pointer-events: none; user-select: none; z-index: 0;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px; border-radius: 100px;
+    border: 1px solid var(--border);
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+    background: rgba(99,102,241,0.06); margin-bottom: 32px;
+    position: relative; z-index: 1;
+  }
+  .badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--p3); box-shadow: 0 0 8px var(--p3);
+    animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 800; line-height: 1.13;
+    letter-spacing: -0.025em; margin-bottom: 20px;
+    position: relative; z-index: 1;
+  }
+  .hero .sub {
+    font-size: 1.1rem; color: var(--muted);
+    max-width: 540px; margin: 0 auto 48px;
+    position: relative; z-index: 1;
+  }
+  .hero-actions {
+    display: flex; gap: 14px; justify-content: center;
+    flex-wrap: wrap; position: relative; z-index: 1;
+  }
+  .btn-grad {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 30px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--p1), var(--p2));
+    font-weight: 600; font-size: 0.95rem; color: white;
+    text-decoration: none;
+    box-shadow: 0 8px 32px rgba(99,102,241,0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-grad:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(99,102,241,0.45); }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 30px; border-radius: 12px;
+    border: 1px solid var(--border);
+    font-weight: 600; font-size: 0.95rem; color: var(--text);
+    text-decoration: none; background: var(--glass);
+    transition: border-color 0.2s;
+  }
+  .btn-ghost:hover { border-color: rgba(99,102,241,0.5); }
+
+  /* ── SECTION LABELS ── */
+  .sec-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p3); margin-bottom: 10px; }
+  .sec-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 14px; }
+  .sec-desc  { color: var(--muted); font-size: 0.95rem; max-width: 540px; margin-bottom: 44px; }
+
+  /* ── STATS ── */
+  .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; background: var(--border); text-align: center; }
+  .stat { background: var(--glass); backdrop-filter: blur(20px); padding: 28px 16px; }
+  .stat-num { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; margin-bottom: 6px; }
+  .stat-lbl { font-size: 0.78rem; color: var(--muted); line-height: 1.45; }
+
+  /* ── PILLARS ── */
+  .pillars { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; border: 1px solid var(--border); border-radius: 20px; overflow: hidden; background: var(--border); }
+  .pillar { background: var(--glass); backdrop-filter: blur(20px); padding: 28px 22px; }
+  .pillar-icon { font-size: 1.5rem; margin-bottom: 10px; }
+  .pillar h3 { font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; }
+  .pillar p  { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── METHOD ── */
+  .method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .method-card { background: var(--glass); border: 1px solid var(--border); border-radius: 16px; padding: 26px; }
+  .method-card.accent { border-color: rgba(99,102,241,0.45); background: rgba(99,102,241,0.06); }
+  .method-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .method-card.accent .method-label { color: var(--p1); }
+  .method-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+  .method-card p  { font-size: 0.83rem; color: var(--muted); line-height: 1.65; }
+  .method-full { grid-column: span 2; }
+
+  /* ── TOOL CARDS ── */
+  .tools { display: flex; flex-direction: column; gap: 14px; }
+  .tool-card {
+    background: var(--glass); backdrop-filter: blur(20px);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 26px 26px 26px 22px;
+    display: grid; grid-template-columns: 54px 1fr; gap: 18px; align-items: start;
+    position: relative; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .tool-card::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: linear-gradient(180deg, var(--p1), var(--p3));
+    border-radius: 3px 0 0 3px;
+  }
+  .tool-card:hover { border-color: rgba(99,102,241,0.45); }
+  .tool-icon {
+    width: 50px; height: 50px; border-radius: 13px;
+    background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.22);
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+  }
+  .tool-body h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+  .tool-body p  { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+  .tool-tag {
+    display: inline-block; margin-top: 10px;
+    padding: 3px 10px; border-radius: 100px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+  }
+  .tag-live   { background: rgba(34,211,238,0.1); border: 1px solid rgba(34,211,238,0.25); color: var(--p3); }
+  .tag-coming { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.25); color: #fbbf24; }
+
+  /* ── 汉分 SECTION ── */
+  .hanfen-wrap {
+    background: var(--glass); backdrop-filter: blur(20px);
+    border: 1px solid var(--border); border-radius: 24px;
+    padding: 44px; position: relative; overflow: hidden;
+  }
+  .hanfen-wrap::before {
+    content: '汉'; position: absolute; right: -16px; top: 50%;
+    transform: translateY(-50%); font-size: 260px; font-weight: 900;
+    color: var(--p2); opacity: 0.05; line-height: 1; pointer-events: none;
+  }
+  .hanfen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; position: relative; z-index: 1; }
+  .hanfen-text h3 { font-size: 1.45rem; font-weight: 800; line-height: 1.3; letter-spacing: -0.02em; margin-bottom: 14px; }
+  .hanfen-text p  { font-size: 0.87rem; color: var(--muted); line-height: 1.75; margin-bottom: 16px; }
+  .hanfen-badge {
+    display: inline-block; padding: 5px 12px; border-radius: 8px;
+    font-size: 11px; font-weight: 600;
+    background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3); color: var(--p1);
+  }
+  .levels { display: flex; flex-direction: column; gap: 13px; }
+  .level-row { display: flex; align-items: center; gap: 10px; }
+  .level-emoji { font-size: 1.15rem; width: 26px; text-align: center; }
+  .level-bar-bg { flex: 1; height: 5px; background: rgba(255,255,255,0.06); border-radius: 100px; overflow: hidden; }
+  .level-bar { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--p1), var(--p3)); }
+  .level-lbl { font-size: 0.75rem; color: var(--muted); min-width: 88px; }
+  .levels-note { font-size: 0.75rem; color: var(--muted); margin-top: 14px; line-height: 1.5; }
+
+  /* ── APPLICATION FORM ── */
+  .form-wrap {
+    background: var(--glass); backdrop-filter: blur(20px);
+    border: 1px solid var(--border); border-radius: 24px;
+    padding: 48px; position: relative; overflow: hidden;
+  }
+  .form-wrap::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--p1), var(--p2), var(--p3));
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: span 2; }
+  .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+  .form-group label span.req { color: var(--p1); margin-left: 2px; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: rgba(148,163,184,0.5); }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: rgba(99,102,241,0.6);
+    background: rgba(99,102,241,0.06);
+  }
+  .form-group select option { background: #0a0f1e; }
+  .form-group textarea { resize: vertical; min-height: 90px; }
+
+  .form-email-hint {
+    grid-column: span 2;
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 16px 18px; border-radius: 12px;
+    background: rgba(34,211,238,0.06);
+    border: 1px solid rgba(34,211,238,0.18);
+    font-size: 0.83rem; color: var(--muted); line-height: 1.6;
+    margin-top: 4px;
+  }
+  .form-email-hint .icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+  .form-email-hint a { color: var(--p3); text-decoration: none; font-weight: 600; }
+  .form-email-hint a:hover { text-decoration: underline; }
+
+  .form-submit-row {
+    grid-column: span 2;
+    display: flex; align-items: center; gap: 20px;
+    flex-wrap: wrap; margin-top: 8px;
+  }
+  .btn-submit {
+    padding: 14px 36px; border: none; border-radius: 12px; cursor: pointer;
+    background: linear-gradient(135deg, var(--p1), var(--p2));
+    font-weight: 700; font-size: 0.95rem; color: white;
+    box-shadow: 0 8px 24px rgba(99,102,241,0.35);
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    font-family: inherit;
+  }
+  .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(99,102,241,0.45); }
+  .btn-submit:disabled { opacity: 0.6; cursor: default; transform: none; }
+  .form-note { font-size: 0.78rem; color: var(--muted); }
+
+  /* success / error */
+  .form-msg {
+    display: none; grid-column: span 2;
+    padding: 14px 18px; border-radius: 12px;
+    font-size: 0.88rem; font-weight: 500;
+  }
+  .form-msg.success { background: rgba(34,211,238,0.08); border: 1px solid rgba(34,211,238,0.25); color: var(--p3); }
+  .form-msg.error   { background: rgba(239,68,68,0.08);  border: 1px solid rgba(239,68,68,0.25);  color: #f87171; }
+
+  /* ── CTA FOOTER ── */
+  .cta-section {
+    text-align: center; padding: 80px 0 96px;
+    position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content: '来'; position: absolute;
+    font-size: 480px; font-weight: 900; color: var(--p1); opacity: 0.025;
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+    line-height: 1; pointer-events: none;
+  }
+  .cta-section h2 {
+    font-size: clamp(1.8rem, 4vw, 2.7rem); font-weight: 800;
+    letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 14px;
+    position: relative; z-index: 1;
+  }
+  .cta-section p { color: var(--muted); font-size: 0.95rem; margin-bottom: 36px; position: relative; z-index: 1; }
+  .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+
+  /* ── FOOTER ── */
+  .footer { border-top: 1px solid var(--border); padding: 22px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .footer-logo { font-size: 1rem; font-weight: 800; letter-spacing: -0.01em; }
+  .footer-links { display: flex; gap: 22px; font-size: 0.78rem; color: var(--muted); }
+  .footer-links a { color: var(--muted); text-decoration: none; }
+  .footer-links a:hover { color: var(--text); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .nav { padding: 14px 20px; }
+    .container { padding: 0 20px; }
+    .pillars, .stats, .hanfen-grid, .form-grid { grid-template-columns: 1fr; }
+    .method-grid { grid-template-columns: 1fr; }
+    .method-full, .form-group.full, .form-email-hint, .form-submit-row, .form-msg { grid-column: span 1; }
+    .form-wrap { padding: 28px 20px; }
+    .hanfen-wrap { padding: 28px 20px; }
+    .hero h1 { font-size: 2rem; }
+    .hero-bg-char { font-size: 220px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo"><span class="grad-text">LELE LAB</span> · 乐乐实验室</div>
+  <a href="https://lelelab.ru" class="nav-link">← Главная</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container" style="position:relative;z-index:1;">
+    <div class="hero-bg-char">来</div>
+    <div class="hero-badge"><span class="badge-dot"></span>Открытый набор преподавателей</div>
+    <h1>Преподавай там, где<br><span class="grad-text">технологии работают за тебя</span></h1>
+    <p class="sub">
+      LELE LAB — онлайн-школа китайского языка с авторской методикой и инфраструктурой,
+      которой нет ни у одной другой школы в России.
+    </p>
+    <div class="hero-actions">
+      <a href="#apply" class="btn-grad">✦ Оставить заявку</a>
+      <a href="#tools" class="btn-ghost">Что мы предлагаем</a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- STATS -->
+<section class="section">
+  <div class="container">
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num"><span class="grad-text">20+</span></div>
+        <div class="stat-lbl">учеников уже<br>занимаются</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num"><span class="grad-text">100%</span></div>
+        <div class="stat-lbl">практика на уроке —<br>никакой теории с нуля</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num"><span class="grad-text">0</span></div>
+        <div class="stat-lbl">паролей, кабинетов<br>и рутинной переписки</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ОТЛИЧИЯ -->
+<section class="section">
+  <div class="container">
+    <div class="sec-label">Почему мы</div>
+    <h2 class="sec-title">Мы не строим<br><span class="grad-text">«обычную языковую школу»</span></h2>
+    <p class="sec-desc">Мы строим лабораторию. Каждый преподаватель получает систему, которая берёт на себя всю административную рутину.</p>
+    <div class="pillars">
+      <div class="pillar">
+        <div class="pillar-icon">⚡️</div>
+        <h3>Никакой рутины</h3>
+        <p>Напоминания, контроль ДЗ, расписание — всё автоматически. Ты занимаешься только преподаванием.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">🔮</div>
+        <h3>Tech-инфраструктура</h3>
+        <p>Telegram-боты, Notion-дашборды — стек, который раньше был только у продуктовых компаний.</p>
+      </div>
+      <div class="pillar">
+        <div class="pillar-icon">📈</div>
+        <h3>Зарплата растёт с результатом</h3>
+        <p>Система 汉分 напрямую связывает твои успехи с учениками и твоё вознаграждение.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- МЕТОДИКА -->
+<section class="section">
+  <div class="container">
+    <div class="sec-label">Методика</div>
+    <h2 class="sec-title"><span class="grad-text">Flipped Class</span> — перевёрнутый класс</h2>
+    <p class="sec-desc">Авторская методика, которая меняет правила игры.</p>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-label">Обычная школа</div>
+        <h4>Урок = объяснение теории</h4>
+        <p>Преподаватель тратит 70% времени на грамматику и правила. Ученик молчит. Прогресс медленный. Скука.</p>
+      </div>
+      <div class="method-card accent">
+        <div class="method-label">LELE LAB</div>
+        <h4>Урок = 100% разговорная практика</h4>
+        <p>Теорию ученик изучает дома. На уроке — только живой диалог и отработка. Прогресс в 2× быстрее.</p>
+      </div>
+      <div class="method-card method-full">
+        <div class="method-label">Что это значит для тебя</div>
+        <h4>Ты ведёшь живые уроки — не читаешь лекции</h4>
+        <p>Никакого монотонного объяснения правил из урока в урок. Каждый урок — живая сессия практики. Ты тренер, а не лектор. Это интереснее, даёт реальный результат — и ученики остаются надолго.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ИНСТРУМЕНТЫ -->
+<section class="section" id="tools">
+  <div class="container">
+    <div class="sec-label">Твой инструментарий</div>
+    <h2 class="sec-title">Инфраструктура,<br><span class="grad-text">которой нет нигде больше</span></h2>
+    <p class="sec-desc">С первого дня у тебя всё настроено и работает без твоего участия.</p>
+    <div class="tools">
+
+      <div class="tool-card">
+        <div class="tool-icon">📱</div>
+        <div class="tool-body">
+          <h3>Telegram Mini App — кабинет ученика</h3>
+          <p>У каждого ученика есть личный кабинет прямо в Telegram. Расписание, баланс уроков, домашние задания — без паролей и регистраций. Нажимает одну кнопку — видит всё. Ты не тратишь ни секунды на «а где найти это».</p>
+          <span class="tool-tag tag-live">Уже работает</span>
+        </div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-icon">📒</div>
+        <div class="tool-body">
+          <h3>Notion Dashboard для каждого ученика</h3>
+          <p>При первом входе в бота автоматически создаётся персональный дашборд: прогресс, материалы, конспекты, задания — структурировано и красиво. Без твоего участия.</p>
+          <span class="tool-tag tag-live">Уже работает</span>
+        </div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-icon">🤖</div>
+        <div class="tool-body">
+          <h3>AI-бот проверки домашних заданий</h3>
+          <p>@lelehwbot будет принимать домашние задания учеников и давать мгновенный фидбек по тонам, иероглифам и грамматике. Ты тратишь время только на живое общение, не на рутину.</p>
+          <span class="tool-tag tag-coming">🚧 В разработке</span>
+        </div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-icon">🔔</div>
+        <div class="tool-body">
+          <h3>Автоматическая система уведомлений</h3>
+          <p>Боты сами напоминают ученикам об уроках, контролируют баланс, отправляют материалы. Ты не пишешь «напомни про урок» вручную — никогда.</p>
+          <span class="tool-tag tag-live">Уже работает</span>
+        </div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-icon">📅</div>
+        <div class="tool-body">
+          <h3>Расписание без головной боли</h3>
+          <p>Все уроки попадают в твой Google Calendar или Apple Calendar автоматически через iCal-подписку. Никаких таблиц, скриншотов, пересылок в мессенджерах.</p>
+          <span class="tool-tag tag-live">Уже работает</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 汉分 -->
+<section class="section">
+  <div class="container">
+    <div class="sec-label">Система вознаграждений</div>
+    <h2 class="sec-title">汉分 — твои очки,<br><span class="grad-text">твоя зарплата</span></h2>
+    <p class="sec-desc" style="margin-bottom:36px;">Система, которой нет ни в одной языковой школе.</p>
+    <div class="hanfen-wrap">
+      <div class="hanfen-grid">
+        <div class="hanfen-text">
+          <h3>Делаешь хорошо —<br>получаешь больше</h3>
+          <p>
+            За каждый проведённый урок ты получаешь 汉分 — очки системы.
+            Оценки учеников после урока прямо влияют на твой рейтинг.
+            Чем выше средний балл твоих учеников — тем выше твой уровень
+            и тем больше твоя ставка за урок.
+          </p>
+          <p>
+            Никаких субъективных «мы оценим твой вклад». Только прозрачная
+            механика: результат → очки → уровень → зарплата.
+          </p>
+          <span class="hanfen-badge">🚧 В разработке · Ранние преподаватели формируют правила</span>
+        </div>
+        <div>
+          <div class="levels">
+            <div class="level-row">
+              <span class="level-emoji">🥚</span>
+              <div class="level-bar-bg"><div class="level-bar" style="width:10%"></div></div>
+              <span class="level-lbl">蛋 · Старт</span>
+            </div>
+            <div class="level-row">
+              <span class="level-emoji">🐣</span>
+              <div class="level-bar-bg"><div class="level-bar" style="width:28%"></div></div>
+              <span class="level-lbl">雏 · 300 очков</span>
+            </div>
+            <div class="level-row">
+              <span class="level-emoji">🐥</span>
+              <div class="level-bar-bg"><div class="level-bar" style="width:50%"></div></div>
+              <span class="level-lbl">学生 · 800 очков</span>
+            </div>
+            <div class="level-row">
+              <span class="level-emoji">🦅</span>
+              <div class="level-bar-bg"><div class="level-bar" style="width:75%"></div></div>
+              <span class="level-lbl">达人 · 2 000 очков</span>
+            </div>
+            <div class="level-row">
+              <span class="level-emoji">🐉</span>
+              <div class="level-bar-bg"><div class="level-bar" style="width:100%"></div></div>
+              <span class="level-lbl">大神 · 5 000 очков</span>
+            </div>
+          </div>
+          <p class="levels-note">Каждый новый уровень = бонус +200 汉分<br>и рост ставки за урок</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- APPLICATION FORM -->
+<section class="section" id="apply">
+  <div class="container">
+    <div class="sec-label">Хочу в команду</div>
+    <h2 class="sec-title">Оставь заявку —<br><span class="grad-text">мы сами с тобой свяжемся</span></h2>
+    <p class="sec-desc" style="margin-bottom:36px;">
+      Заполни форму ниже. Мы рассматриваем каждую анкету и пишем тем, кто подходит.
+      Резюме — на почту, ссылка ниже.
+    </p>
+    <div class="form-wrap">
+      <form id="applyForm">
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>Имя <span class="req">*</span></label>
+            <input type="text" id="f-name" placeholder="Как к тебе обращаться" required>
+          </div>
+
+          <div class="form-group">
+            <label>Telegram <span class="req">*</span></label>
+            <input type="text" id="f-tg" placeholder="@username" required>
+          </div>
+
+          <div class="form-group">
+            <label>Уровень китайского <span class="req">*</span></label>
+            <select id="f-level" required>
+              <option value="" disabled selected>Выбери уровень</option>
+              <option>HSK 1–2 (базовый)</option>
+              <option>HSK 3–4 (средний)</option>
+              <option>HSK 5–6 (продвинутый)</option>
+              <option>Носительский / диплом преподавателя</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Опыт преподавания</label>
+            <select id="f-exp">
+              <option value="" disabled selected>Выбери стаж</option>
+              <option>Нет опыта, готов учиться</option>
+              <option>До 1 года</option>
+              <option>1–3 года</option>
+              <option>3–5 лет</option>
+              <option>5+ лет</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label>Пару слов о себе <span style="color:var(--muted);font-weight:400;">(необязательно)</span></label>
+            <textarea id="f-about" placeholder="Почему хочешь преподавать в LELE LAB, какой формат предпочитаешь, любые детали"></textarea>
+          </div>
+
+          <div class="form-email-hint">
+            <span class="icon">📎</span>
+            <span>
+              Прикрепи резюме или портфолио и отправь на
+              <a href="mailto:yan228.khertek@gmail.com?subject=Заявка преподавателя LELE LAB">yan228.khertek@gmail.com</a>
+              — тема письма: <strong>«Заявка преподавателя LELE LAB»</strong>.
+              Это ускорит рассмотрение.
+            </span>
+          </div>
+
+          <div id="formMsg" class="form-msg"></div>
+
+          <div class="form-submit-row">
+            <button type="submit" class="btn-submit" id="submitBtn">✦ Отправить заявку</button>
+            <span class="form-note">Мы рассматриваем анкеты в течение 3 рабочих дней</span>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2>Остались вопросы?<br><span class="grad-text">Пиши напрямую</span></h2>
+    <p>Расскажем подробнее о формате работы, ставках и планах на год.</p>
+    <div class="cta-btns">
+      <a href="https://t.me/neleika" class="btn-grad">💬 Написать в Telegram</a>
+      <a href="https://lelelab.ru" class="btn-ghost">🌐 lelelab.ru</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo"><span class="grad-text">LELE LAB</span> · 乐乐实验室</div>
+  <div class="footer-links">
+    <a href="https://t.me/neleika">Telegram</a>
+    <a href="https://lelelab.ru">Сайт</a>
+    <a href="https://lelelab.ru/oferta.html">Оферта</a>
+  </div>
+</footer>
+
+<script>
+  const BOT_TOKEN = '8620946003:AAGwXF1clHi2KJbM5DSQ_mNfBX-V7wAEv8w';
+  const CHAT_ID   = '1291657098';
+
+  document.getElementById('applyForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const name  = document.getElementById('f-name').value.trim();
+    const tg    = document.getElementById('f-tg').value.trim();
+    const level = document.getElementById('f-level').value;
+    const exp   = document.getElementById('f-exp').value || 'не указан';
+    const about = document.getElementById('f-about').value.trim() || '—';
+
+    const btn = document.getElementById('submitBtn');
+    const msg = document.getElementById('formMsg');
+
+    btn.disabled = true;
+    btn.textContent = 'Отправляем…';
+    msg.style.display = 'none';
+
+    const text =
+      `🎓 <b>Новая заявка преподавателя</b>\n\n` +
+      `👤 <b>Имя:</b> ${name}\n` +
+      `📱 <b>Telegram:</b> ${tg}\n` +
+      `🇨🇳 <b>Уровень китайского:</b> ${level}\n` +
+      `🏫 <b>Опыт преподавания:</b> ${exp}\n` +
+      `📝 <b>О себе:</b> ${about}\n\n` +
+      `🔗 Источник: lelelab.ru/fortutors`;
+
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: 'HTML' })
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        msg.className = 'form-msg success';
+        msg.textContent = '✓ Заявка отправлена! Мы рассмотрим её в течение 3 рабочих дней и напишем тебе в Telegram.';
+        msg.style.display = 'block';
+        document.getElementById('applyForm').reset();
+        btn.textContent = '✓ Отправлено';
+      } else {
+        throw new Error(data.description || 'Telegram error');
+      }
+    } catch (err) {
+      msg.className = 'form-msg error';
+      msg.textContent = '✗ Не удалось отправить. Напиши нам напрямую: @leleikaa в Telegram.';
+      msg.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '✦ Отправить заявку';
+    }
+  });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
+
+</body>
+</html>
