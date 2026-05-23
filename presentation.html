@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LELE LAB — Твой китайский</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#020617;
+    --v1:#6366f1;--v2:#3b82f6;--v3:#22d3ee;
+    --grad:linear-gradient(135deg,var(--v1),var(--v2),var(--v3));
+    --grad-text:linear-gradient(90deg,var(--v1),var(--v3));
+    --white:#fff;--muted:rgba(255,255,255,.55);
+    --card:rgba(255,255,255,.04);
+    --card-border:rgba(255,255,255,.1);
+  }
+  html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Inter',sans-serif;color:var(--white)}
+
+  /* ── SLIDES ─────────────────────────────────────────── */
+  .deck{width:100%;height:100%;position:relative}
+  .slide{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    padding:48px 64px;
+    opacity:0;pointer-events:none;
+    transition:opacity .5s ease, transform .5s ease;
+    transform:translateY(24px);
+    overflow:hidden;
+  }
+  .slide.active{opacity:1;pointer-events:all;transform:translateY(0)}
+  .slide.exit{opacity:0;transform:translateY(-24px)}
+
+  /* ── BG DECO ─────────────────────────────────────────── */
+  .blob{
+    position:absolute;border-radius:50%;filter:blur(120px);opacity:.18;pointer-events:none;z-index:0;
+  }
+  .blob-1{width:600px;height:600px;background:var(--v1);top:-200px;left:-150px}
+  .blob-2{width:500px;height:500px;background:var(--v3);bottom:-200px;right:-100px}
+  .blob-3{width:400px;height:400px;background:var(--v2);top:50%;left:50%;transform:translate(-50%,-50%)}
+
+  .cn-deco{
+    position:absolute;font-size:200px;font-weight:900;
+    opacity:.04;pointer-events:none;z-index:0;
+    background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    user-select:none;
+  }
+
+  /* ── TYPOGRAPHY ──────────────────────────────────────── */
+  .tag{
+    display:inline-block;padding:6px 16px;border-radius:999px;
+    background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.4);
+    font-size:13px;font-weight:600;color:var(--v1);
+    text-transform:uppercase;letter-spacing:.08em;margin-bottom:20px;
+  }
+  h1{font-size:clamp(36px,5vw,68px);font-weight:900;line-height:1.05;text-align:center;position:relative;z-index:1}
+  h2{font-size:clamp(28px,4vw,52px);font-weight:800;line-height:1.1;text-align:center;position:relative;z-index:1}
+  h3{font-size:clamp(20px,2.5vw,32px);font-weight:700;position:relative;z-index:1}
+  .grad{background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{font-size:clamp(15px,1.6vw,20px);color:var(--muted);text-align:center;max-width:640px;line-height:1.65;position:relative;z-index:1;margin-top:16px}
+  .emoji-big{font-size:72px;margin-bottom:8px;display:block}
+
+  /* ── CARDS ───────────────────────────────────────────── */
+  .cards{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;margin-top:32px;width:100%;max-width:960px}
+  .card{
+    flex:1;min-width:200px;max-width:280px;
+    background:var(--card);border:1px solid var(--card-border);
+    border-radius:20px;padding:28px 24px;
+    backdrop-filter:blur(12px);
+  }
+  .card-icon{font-size:36px;margin-bottom:12px;display:block}
+  .card h4{font-size:17px;font-weight:700;margin-bottom:8px}
+  .card p{font-size:14px;color:var(--muted);line-height:1.6}
+
+  /* ── VS BLOCK ────────────────────────────────────────── */
+  .vs-wrap{display:flex;gap:24px;align-items:stretch;width:100%;max-width:880px;position:relative;z-index:1;margin-top:28px}
+  .vs-col{flex:1;border-radius:20px;padding:28px 24px}
+  .vs-col.bad{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2)}
+  .vs-col.good{background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.2)}
+  .vs-col h4{font-size:16px;font-weight:700;margin-bottom:16px}
+  .vs-col.bad h4{color:#f87171}
+  .vs-col.good h4{color:var(--v3)}
+  .vs-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .vs-col ul li{font-size:14px;color:var(--muted);display:flex;gap:8px;line-height:1.5}
+  .vs-col ul li::before{flex-shrink:0;margin-top:1px}
+  .vs-col.bad ul li::before{content:"✗";color:#f87171}
+  .vs-col.good ul li::before{content:"✓";color:var(--v3);font-weight:700}
+  .vs-badge{
+    align-self:center;flex-shrink:0;
+    font-size:22px;font-weight:900;color:var(--muted);
+  }
+
+  /* ── PRICE BLOCK ─────────────────────────────────────── */
+  .price-card{
+    background:var(--card);border:1px solid var(--card-border);
+    border-radius:28px;padding:44px 52px;text-align:center;
+    position:relative;z-index:1;max-width:600px;width:100%;margin-top:28px;
+    backdrop-filter:blur(16px);
+  }
+  .price-label{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+  .price-main{font-size:clamp(48px,7vw,80px);font-weight:900;line-height:1}
+  .price-sub{font-size:16px;color:var(--muted);margin-top:6px}
+  .price-items{
+    display:flex;flex-direction:column;gap:10px;margin:28px 0;
+    text-align:left;
+  }
+  .price-item{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:rgba(255,255,255,.8);line-height:1.5}
+  .price-item-icon{flex-shrink:0;font-size:16px;margin-top:1px}
+  .price-divider{height:1px;background:var(--card-border);margin:24px 0}
+  .price-old{font-size:16px;color:var(--muted);text-decoration:line-through;margin-bottom:4px}
+  .price-badge{
+    display:inline-block;padding:4px 12px;border-radius:999px;
+    background:rgba(34,211,238,.15);border:1px solid rgba(34,211,238,.3);
+    font-size:13px;font-weight:700;color:var(--v3);margin-left:8px;vertical-align:middle;
+  }
+
+  /* ── CTA BUTTON ──────────────────────────────────────── */
+  .btn{
+    display:inline-block;margin-top:24px;
+    padding:18px 48px;border-radius:999px;
+    background:var(--grad);
+    font-size:18px;font-weight:700;color:#fff;
+    border:none;cursor:pointer;
+    box-shadow:0 8px 32px rgba(99,102,241,.4);
+    transition:transform .2s,box-shadow .2s;
+    position:relative;z-index:1;
+    text-decoration:none;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(99,102,241,.55)}
+  .btn-ghost{
+    display:inline-block;margin-top:12px;
+    padding:14px 36px;border-radius:999px;
+    background:transparent;border:1px solid var(--card-border);
+    font-size:16px;font-weight:600;color:var(--muted);cursor:pointer;
+    transition:border-color .2s,color .2s;
+    text-decoration:none;
+  }
+  .btn-ghost:hover{border-color:rgba(255,255,255,.3);color:#fff}
+
+  /* ── CHECKLIST ───────────────────────────────────────── */
+  .checklist{display:flex;flex-direction:column;gap:14px;position:relative;z-index:1;margin-top:28px;max-width:640px;width:100%}
+  .check-item{display:flex;gap:14px;align-items:flex-start}
+  .check-icon{
+    flex-shrink:0;width:28px;height:28px;border-radius:50%;
+    background:rgba(34,211,238,.15);border:1px solid rgba(34,211,238,.3);
+    display:flex;align-items:center;justify-content:center;font-size:13px;margin-top:2px;
+  }
+  .check-text{font-size:16px;line-height:1.55;color:rgba(255,255,255,.88)}
+  .check-text strong{color:#fff}
+
+  /* ── STATS ───────────────────────────────────────────── */
+  .stats{display:flex;gap:32px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1;margin-top:32px}
+  .stat{text-align:center}
+  .stat-num{font-size:clamp(36px,5vw,60px);font-weight:900;line-height:1}
+  .stat-label{font-size:13px;color:var(--muted);margin-top:4px;max-width:120px}
+
+  /* ── LIYA ────────────────────────────────────────────── */
+  .liya-wrap{display:flex;gap:40px;align-items:center;max-width:820px;width:100%;position:relative;z-index:1;margin-top:24px}
+  .liya-avatar{
+    flex-shrink:0;width:160px;height:160px;border-radius:50%;
+    background:var(--grad);padding:3px;
+  }
+  .liya-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;background:#0f172a}
+  .liya-info{flex:1}
+  .liya-name{font-size:24px;font-weight:800;margin-bottom:4px}
+  .liya-role{font-size:14px;color:var(--v3);font-weight:600;margin-bottom:16px}
+  .liya-points{display:flex;flex-direction:column;gap:8px}
+  .liya-point{font-size:14px;color:rgba(255,255,255,.8);display:flex;gap:8px;line-height:1.5}
+  .liya-point::before{content:"🏅";flex-shrink:0}
+
+  /* ── PROGRESS ────────────────────────────────────────── */
+  .progress{
+    position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+    display:flex;gap:8px;z-index:100;
+  }
+  .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:rgba(255,255,255,.2);
+    transition:all .3s;cursor:pointer;
+  }
+  .dot.active{width:24px;border-radius:4px;background:var(--v3)}
+
+  /* ── NAV ARROWS ──────────────────────────────────────── */
+  .nav{
+    position:fixed;bottom:24px;z-index:100;
+    display:flex;gap:12px;
+  }
+  .nav.left{left:32px}
+  .nav.right{right:32px}
+  .nav-btn{
+    width:44px;height:44px;border-radius:50%;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;font-size:18px;color:var(--muted);
+    transition:all .2s;backdrop-filter:blur(8px);
+  }
+  .nav-btn:hover{background:rgba(255,255,255,.15);color:#fff}
+
+  /* ── SLIDE NUM ───────────────────────────────────────── */
+  .slide-num{
+    position:fixed;top:24px;right:32px;
+    font-size:13px;color:var(--muted);z-index:100;
+    font-weight:500;
+  }
+
+  /* ── LOGO ────────────────────────────────────────────── */
+  .logo{
+    position:fixed;top:24px;left:32px;
+    font-size:20px;font-weight:900;z-index:100;
+    background:var(--grad-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+
+  /* ── RIBBON ──────────────────────────────────────────── */
+  .ribbon{
+    position:absolute;top:24px;right:-32px;
+    background:var(--grad);padding:6px 40px;
+    font-size:12px;font-weight:700;color:#fff;
+    transform:rotate(45deg);transform-origin:center;
+    letter-spacing:.06em;
+  }
+
+  @media(max-width:768px){
+    .slide{padding:32px 24px}
+    .vs-wrap{flex-direction:column}
+    .liya-wrap{flex-direction:column;text-align:center}
+    .liya-points{align-items:center}
+    .cards{flex-direction:column;align-items:center}
+    .price-card{padding:32px 24px}
+  }
+</style>
+</head>
+<body>
+
+<div class="logo">LELE LAB</div>
+<div class="slide-num" id="slideNum">1 / 10</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 1 — HOOK -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="deck">
+<div class="slide active" id="s1">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="cn-deco" style="top:-60px;right:-40px">学</div>
+
+  <span class="emoji-big">🐉</span>
+  <div class="tag">Добро пожаловать</div>
+  <h1>Ты только что<br><span class="grad">почувствовал(а),</span><br>как это работает</h1>
+  <p class="sub">Этот урок — не случайность.<br>Это методика, которая делает китайский понятным с первого занятия.</p>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 2 — ПРОБЛЕМА -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-3"></div>
+  <div class="cn-deco" style="bottom:-80px;left:-60px">难</div>
+
+  <div class="tag">Честно о рынке</div>
+  <h2>Почему <span class="grad">80% бросают</span><br>китайский через 3 месяца</h2>
+
+  <div class="vs-wrap">
+    <div class="vs-col bad">
+      <h4>❌ Обычные школы</h4>
+      <ul>
+        <li>Полурока объясняют правила вслух</li>
+        <li>Дома — скучные упражнения из учебника</li>
+        <li>Говорить начинают «потом»</li>
+        <li>Прогресса не видно месяцами</li>
+        <li>Платишь за время, а не за результат</li>
+      </ul>
+    </div>
+    <div class="vs-badge">VS</div>
+    <div class="vs-col good">
+      <h4>✓ LELE LAB</h4>
+      <ul>
+        <li>Теорию учишь дома по видео Лии</li>
+        <li>На уроке — 100% говоришь и практикуешь</li>
+        <li>Говоришь с первого занятия</li>
+        <li>Прогресс виден уже через 2 недели</li>
+        <li>Платишь за результат</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 3 — МЕТОДИКА -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="cn-deco" style="top:-40px;right:-20px">法</div>
+
+  <div class="tag">Наша методика</div>
+  <h2><span class="grad">Flipped Class</span><br>— перевёрнутый класс</h2>
+  <p class="sub">Авторская методика, по которой занимаются все ученики LELE LAB</p>
+
+  <div class="cards">
+    <div class="card">
+      <span class="card-icon">📱</span>
+      <h4>Дома — теория</h4>
+      <p>Короткие видео от Лии. Тоны, иероглифы, грамматика — в любое удобное время</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🗣️</span>
+      <h4>На уроке — практика</h4>
+      <p>Никаких объяснений. Только живой разговор, ролевые ситуации, разбор ошибок</p>
+    </div>
+    <div class="card">
+      <span class="card-icon">🚀</span>
+      <h4>Результат × 2</h4>
+      <p>В 2 раза больше speaking time за те же деньги. Прогресс быстрее, чем у конкурентов</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 4 — ЛИЯ -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="cn-deco" style="bottom:-60px;right:-40px">师</div>
+
+  <div class="tag">Основатель школы</div>
+  <h2>Лия Зу — <span class="grad">это система,<br>а не просто преподаватель</span></h2>
+
+  <div class="liya-wrap">
+    <div class="liya-avatar">
+      <img src="liya.jpg" alt="Лия Зу" onerror="this.style.background='linear-gradient(135deg,#6366f1,#22d3ee)'">
+    </div>
+    <div class="liya-info">
+      <div class="liya-name">Лия Зу</div>
+      <div class="liya-role">Основатель & методолог LELE LAB</div>
+      <div class="liya-points">
+        <div class="liya-point">Носительский уровень китайского, диплом преподавателя</div>
+        <div class="liya-point">Сертификаты HSK — разработала программу под каждый уровень</div>
+        <div class="liya-point">20 000+ подписчиков в Instagram, обучающий контент каждую неделю</div>
+        <div class="liya-point">Создала каждый видеоурок, задание и материал в LELE LAB лично</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="sub" style="margin-top:20px;font-size:14px">
+    Лия ведёт разговорные встречи для всех учеников, выходит в рилсах и вебинарах.<br>
+    Её методика — в каждом вашем уроке.
+  </p>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 5 — ЧТО ВХОДИТ -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="blob blob-3"></div>
+  <div class="cn-deco" style="top:-30px;left:-50px">包</div>
+
+  <div class="tag">Групповой пакет</div>
+  <h2>Всё, что нужно для <span class="grad">реального прогресса</span></h2>
+
+  <div class="checklist">
+    <div class="check-item">
+      <div class="check-icon">🎓</div>
+      <div class="check-text"><strong>8 групповых уроков</strong> — 2 раза в неделю, группа до 4 человек</div>
+    </div>
+    <div class="check-item">
+      <div class="check-icon">🎬</div>
+      <div class="check-text"><strong>Видеоуроки теории от Лии</strong> — перед каждым занятием, по авторской методике</div>
+    </div>
+    <div class="check-item">
+      <div class="check-icon">🗓️</div>
+      <div class="check-text"><strong>Разговорная встреча с Лией</strong> — раз в месяц для всех учеников</div>
+    </div>
+    <div class="check-item">
+      <div class="check-icon">🤖</div>
+      <div class="check-text"><strong>AI-агент</strong> — проверка тонов, практика произношения, проверка ДЗ 24/7</div>
+    </div>
+    <div class="check-item">
+      <div class="check-icon">📝</div>
+      <div class="check-text"><strong>Домашние задания + чат с преподавателем</strong> — поддержка между уроками</div>
+    </div>
+    <div class="check-item">
+      <div class="check-icon">🎥</div>
+      <div class="check-text"><strong>Запись каждого урока</strong> — пересмотри в любой момент</div>
+    </div>
+    <div class="check-item">
+      <div class="check-icon">📊</div>
+      <div class="check-text"><strong>Личный кабинет</strong> — твой прогресс, расписание и материалы в одном месте</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 6 — LELE STUDENT BOT -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-3"></div>
+  <div class="cn-deco" style="bottom:-60px;left:-40px">聊</div>
+
+  <div style="display:flex;align-items:center;gap:40px;width:100%;max-width:1040px;position:relative;z-index:1">
+
+    <!-- ── Phone: Telegram chat ───────────────────── -->
+    <div style="flex-shrink:0;width:240px">
+      <div style="background:#5f83b5;border-radius:36px;border:2px solid #4a6a9a;overflow:hidden;box-shadow:0 28px 72px rgba(0,0,0,.8);font-family:'Inter',sans-serif">
+
+        <!-- status bar -->
+        <div style="background:#4a7ab5;padding:7px 14px 0;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:8px;color:rgba(255,255,255,.8);font-weight:600">00:48</span>
+          <div style="display:flex;gap:4px;align-items:center">
+            <span style="font-size:8px;color:rgba(255,255,255,.8)">📶</span>
+            <span style="font-size:8px;color:rgba(255,255,255,.8)">WiFi</span>
+          </div>
+        </div>
+
+        <!-- telegram header -->
+        <div style="background:linear-gradient(180deg,#4a7ab5,#5b8ac7);padding:8px 12px 10px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.1)">
+          <div style="width:28px;height:28px;border-radius:50%;background:#2AABEE;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0">LS</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:11px;font-weight:700;color:#fff">Lele student</div>
+            <div style="font-size:8px;color:rgba(255,255,255,.6)">bot</div>
+          </div>
+          <div style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:11px">🎓</div>
+        </div>
+
+        <!-- chat area -->
+        <div style="background:linear-gradient(180deg,#7da8d8 0%,#5a92c9 40%,#3d7ab5 100%);padding:10px 8px 8px;min-height:200px">
+
+          <!-- message bubble -->
+          <div style="background:#fff;border-radius:14px 14px 14px 2px;padding:11px 13px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,.15)">
+            <div style="font-size:10px;font-weight:400;color:#222;line-height:1.6;margin-bottom:6px">
+              你好, <strong>Ян!</strong> 🇨🇳
+            </div>
+            <div style="font-size:9px;color:#444;line-height:1.8">
+              📦 Тариф: <strong>Премиум</strong><br>
+              📊 Осталось уроков: <strong>8</strong><br>
+              🏆 汉分: <strong>470 · 雛 🐣</strong>
+            </div>
+            <div style="font-size:9px;color:#555;margin-top:8px">Выбери действие:</div>
+            <div style="font-size:7.5px;color:#999;text-align:right;margin-top:4px">18:53</div>
+          </div>
+
+          <!-- inline keyboard -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px">
+            <div style="background:#2AABEE;border-radius:8px;padding:8px 6px;text-align:center;font-size:8.5px;font-weight:600;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2)">📚 Следующий ур...</div>
+            <div style="background:#2AABEE;border-radius:8px;padding:8px 6px;text-align:center;font-size:8.5px;font-weight:600;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2)">📅 Расписание</div>
+            <div style="background:#2AABEE;border-radius:8px;padding:8px 6px;text-align:center;font-size:8.5px;font-weight:600;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2)">📝 Домашнее зад...</div>
+            <div style="background:#2AABEE;border-radius:8px;padding:8px 6px;text-align:center;font-size:8.5px;font-weight:600;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2)">💰 Баланс</div>
+            <div style="background:#2AABEE;border-radius:8px;padding:8px 6px;text-align:center;font-size:8.5px;font-weight:600;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2)">📅 iCal</div>
+            <div style="background:#2AABEE;border-radius:8px;padding:8px 6px;text-align:center;font-size:8.5px;font-weight:600;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2)">📋 Мой дашборд</div>
+          </div>
+          <!-- full-width button -->
+          <div style="background:linear-gradient(90deg,#1a3a8a,#1255c0);border-radius:8px;padding:8px;text-align:center;font-size:8.5px;font-weight:600;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.25)">❓ Помощь</div>
+        </div>
+
+        <!-- bottom bar -->
+        <div style="background:linear-gradient(180deg,#4a7ab5,#3a6aa5);padding:8px 12px;display:flex;align-items:center;gap:8px;border-top:1px solid rgba(255,255,255,.1)">
+          <div style="background:rgba(255,255,255,.95);border-radius:20px;padding:6px 12px;display:flex;align-items:center;gap:5px;flex-shrink:0">
+            <div style="width:14px;height:14px;border-radius:3px;background:linear-gradient(135deg,#6366f1,#22d3ee);display:flex;align-items:center;justify-content:center;font-size:7px">📱</div>
+            <span style="font-size:9px;font-weight:700;color:#1a1a2e">Open App</span>
+          </div>
+          <div style="flex:1;background:rgba(255,255,255,.15);border-radius:20px;padding:6px 10px">
+            <span style="font-size:8px;color:rgba(255,255,255,.5)">Message</span>
+          </div>
+          <span style="font-size:14px">🎤</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── Правая часть: copy ───────────────────────── -->
+    <div style="flex:1;min-width:0">
+      <!-- Telegram badge -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div style="width:28px;height:28px;background:linear-gradient(135deg,#2AABEE,#229ED9);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">✈️</div>
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.1em">@lelestudentbot</div>
+      </div>
+
+      <h2 style="text-align:left;font-size:clamp(22px,3vw,42px);margin-bottom:12px;line-height:1.1">
+        Telegram —<br><span class="grad">всегда под рукой</span>
+      </h2>
+      <p style="font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:26px;max-width:440px">
+        Никаких новых приложений. Личный бот прямо в Telegram — расписание, ДЗ, баланс в одном месте и в одном клике.
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="flex-shrink:0;width:36px;height:36px;border-radius:10px;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);display:flex;align-items:center;justify-content:center;font-size:17px">📅</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:#fff">Автоматическое расписание + iCal</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:2px">Все уроки сразу в твоём календаре. Подписка на живой iCal — занятия обновляются сами</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="flex-shrink:0;width:36px;height:36px;border-radius:10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);display:flex;align-items:center;justify-content:center;font-size:17px">📝</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:#fff">Домашние задания прямо в боте</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:2px">Получаешь ДЗ, сдаёшь через бот, AI проверяет и ставит оценку — и сразу +汉分</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="flex-shrink:0;width:36px;height:36px;border-radius:10px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);display:flex;align-items:center;justify-content:center;font-size:17px">💰</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:#fff">Баланс уроков и 汉分 в реальном времени</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:2px">Всегда знаешь сколько уроков осталось, сколько баллов и какая скидка на следующий пакет</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="flex-shrink:0;width:36px;height:36px;border-radius:10px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.2);display:flex;align-items:center;justify-content:center;font-size:17px">📱</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;color:#fff">Кнопка Open App — мини-приложение</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:2px">Прогресс, рейтинг, история начислений — открывается прямо из чата в один клик</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SLIDE 7 — NOTION DASHBOARD -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-3"></div>
+  <div class="cn-deco" style="top:-40px;left:-40px">板</div>
+
+  <div style="display:flex;align-items:center;gap:32px;width:100%;max-width:1060px;position:relative;z-index:1">
+
+    <!-- ── Два телефона ─────────────────────────────── -->
+    <div style="display:flex;gap:16px;flex-shrink:0">
+
+      <!-- Phone 1 -->
+      <div style="width:190px;background:#111;border-radius:36px;border:2px solid #2a2a2a;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.7);font-family:'Inter',sans-serif">
+        <!-- Cover -->
+        <div style="height:90px;background:linear-gradient(180deg,#1a0a2e 0%,#0d1117 60%,#111 100%);position:relative;overflow:hidden">
+          <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(180,40,40,.5),transparent 60%),radial-gradient(ellipse at 70% 30%,rgba(80,20,100,.4),transparent 60%)"></div>
+          <div style="position:absolute;bottom:-2px;left:12px;font-size:32px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.8))">🏮</div>
+          <!-- status bar -->
+          <div style="position:absolute;top:6px;left:12px;right:12px;display:flex;justify-content:space-between;font-size:8px;color:rgba(255,255,255,.5)">
+            <span>23:44</span><span>▪▪▪ ◀ 30</span>
+          </div>
+        </div>
+        <!-- Content -->
+        <div style="padding:10px 12px;background:#191919">
+          <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:10px">Алиса</div>
+          <!-- Props -->
+          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
+            <div style="display:flex;gap:6px;align-items:center">
+              <span style="font-size:9px;color:#555">📅</span>
+              <span style="font-size:8px;color:#666">Дата нач.</span>
+              <span style="font-size:8px;color:#aaa;margin-left:auto">17 Apr 2026</span>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <span style="font-size:9px;color:#555">≡</span>
+              <span style="font-size:8px;color:#666">Преподав.</span>
+              <span style="font-size:8px;color:#aaa;margin-left:auto">Лия Зу</span>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <span style="font-size:9px;color:#555">◎</span>
+              <span style="font-size:8px;color:#666">Тариф</span>
+              <span style="margin-left:auto;font-size:7px;font-weight:700;background:#4a2060;color:#c084fc;padding:2px 6px;border-radius:4px">Премиум</span>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <span style="font-size:9px;color:#555">◎</span>
+              <span style="font-size:8px;color:#666">Уровень</span>
+              <span style="margin-left:auto;font-size:7px;font-weight:700;background:#1a3a1a;color:#4ade80;padding:2px 6px;border-radius:4px">HSK 1</span>
+            </div>
+          </div>
+          <div style="height:1px;background:#2a2a2a;margin-bottom:8px"></div>
+          <!-- 汉分 callout -->
+          <div style="background:#1e1e1e;border-left:3px solid #f97316;border-radius:4px;padding:6px 8px;margin-bottom:8px">
+            <div style="font-size:8px;color:#e2e8f0;font-weight:600">🔴 汉分 · <strong style="color:#fb923c">420 очков</strong> — уровень 🐣 雛</div>
+          </div>
+          <!-- Progress -->
+          <div style="margin-bottom:8px">
+            <div style="font-size:7px;color:#888;margin-bottom:3px">До следующего уровня 🐥 学生:</div>
+            <div style="background:#2a2a2a;border-radius:3px;height:5px;overflow:hidden">
+              <div style="width:52%;height:100%;background:linear-gradient(90deg,#6366f1,#22d3ee)"></div>
+            </div>
+            <div style="font-size:7px;color:#666;margin-top:2px;text-align:right">420 / 800</div>
+          </div>
+          <!-- Next lesson -->
+          <div style="background:#1e1e1e;border-radius:6px;padding:6px 8px">
+            <div style="font-size:8px;font-weight:700;color:#fff;margin-bottom:4px">📅 Ближайший урок</div>
+            <div style="font-size:7px;color:#aaa">📅 Вторник, 20 мая · 17:00 МСК</div>
+            <div style="font-size:7px;color:#60a5fa;margin-top:2px">🔗 Подключиться к Zoom</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone 2 -->
+      <div style="width:190px;background:#111;border-radius:36px;border:2px solid #2a2a2a;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.7);font-family:'Inter',sans-serif;margin-top:28px">
+        <!-- status bar -->
+        <div style="background:#191919;padding:8px 12px 0;display:flex;justify-content:space-between">
+          <span style="font-size:8px;color:rgba(255,255,255,.4)">23:44</span>
+          <span style="font-size:8px;color:rgba(255,255,255,.4)">▪▪▪ ◀ 30</span>
+        </div>
+        <!-- Nav -->
+        <div style="background:#191919;padding:4px 12px 6px;border-bottom:1px solid #2a2a2a">
+          <div style="font-size:10px;font-weight:700;color:#fff">Алиса</div>
+          <div style="font-size:8px;color:#555">Кабинеты учеников</div>
+        </div>
+        <div style="padding:10px 12px;background:#191919">
+          <!-- HW -->
+          <div style="margin-bottom:10px">
+            <div style="font-size:10px;font-weight:700;color:#fff;margin-bottom:4px">✅ Домашние задания</div>
+            <div style="font-size:7px;color:#60a5fa;margin-bottom:6px">Открыть все ДЗ →</div>
+            <div style="font-size:8px;font-weight:600;color:#aaa;margin-bottom:3px">Текущее:</div>
+            <div style="background:#1e1e1e;border-left:3px solid #22c55e;border-radius:4px;padding:5px 7px;font-size:7px;color:#d1d5db;line-height:1.5">
+              ✅ Урок 8 · Иероглифы + конструкция 是...的 — <span style="color:#ef4444;font-weight:700">🔴 Не сдано</span> · до 22 мая
+            </div>
+            <div style="font-size:8px;font-weight:600;color:#aaa;margin:6px 0 3px">История:</div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="font-size:7px;color:#9ca3af">• Урок 7 · Произношение тонов — 🤖 AI: <strong style="color:#fbbf24">95/100 ⭐</strong></div>
+              <div style="font-size:7px;color:#9ca3af">• Урок 6 · Числа 1–100 — 🤖 AI: <strong style="color:#e2e8f0">88/100</strong></div>
+            </div>
+          </div>
+          <div style="height:1px;background:#2a2a2a;margin-bottom:8px"></div>
+          <!-- Recordings -->
+          <div>
+            <div style="font-size:10px;font-weight:700;color:#fff;margin-bottom:6px">🎙 Записи уроков</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <div style="font-size:7px;color:#9ca3af">• <strong style="color:#e2e8f0">Урок 8</strong> · 13 мая 2026 · <span style="color:#60a5fa">Смотреть →</span></div>
+              <div style="font-size:7px;color:#9ca3af">• <strong style="color:#e2e8f0">Урок 7</strong> · 8 мая 2026 · <span style="color:#60a5fa">Смотреть →</span></div>
+              <div style="font-size:7px;color:#9ca3af">• <strong style="color:#e2e8f0">Урок 6</strong> · 6 мая 2026 · <span style="color:#60a5fa">Смотреть →</span></div>
+              <div style="font-size:7px;color:#9ca3af">• <strong style="color:#e2e8f0">Урок 5</strong> · 1 мая 2026 · <span style="color:#60a5fa">Смотреть →</span></div>
+              <div style="font-size:7px;color:#555">• Урок 4 · 29 апр · ...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Правая часть: copy ───────────────────────── -->
+    <div style="flex:1;min-width:0">
+      <!-- Notion badge -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <svg width="28" height="28" viewBox="0 0 335 350" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;border-radius:4px"><path d="M21.056 15.057L214.701.796C238.481-1.243 244.599.123 259.545 10.98L321.359 54.426C331.558 61.897 334.958 63.931 334.958 72.075V310.358C334.958 325.292 329.518 334.124 310.498 335.475L85.619 349.054C71.342 349.735 64.546 347.701 57.069 338.19L11.549 279.13C3.392 268.259 0 260.126 0 250.61V38.808C0 26.595 5.442 16.409 21.056 15.057Z" fill="white"/><path fill-rule="evenodd" clip-rule="evenodd" d="M214.701.796L21.056 15.057C5.442 16.409 0 26.595 0 38.808V250.61c0 9.516 3.392 17.649 11.549 28.52l45.52 59.06c7.477 9.511 14.272 11.545 28.55 10.864L310.498 335.475c19.02-1.351 24.46-10.183 24.46-25.117V72.075c0-7.72-3.054-9.95-12.059-16.523l-.6-.426L259.545 10.98C244.599.123 238.481-1.243 214.701.796ZM90.718 68.166c-18.36 1.24-22.532 1.522-32.958-6.948L31.246 40.174c-2.704-2.721-1.348-6.116 5.441-6.789L222.855 19.806c15.623-1.36 23.774 4.08 29.892 8.829l31.931 23.083c1.36.676 4.751 4.744.673 4.744L93.088 68.007l-2.37.16ZM69.303 308.318V106.024c0-8.823 2.718-12.899 10.866-13.584L300.977 79.546c7.489-.679 10.88 4.076 10.88 12.894V293.376c0 8.832-1.362 16.31-13.596 16.982L86.964 322.584c-12.228.673-17.661-3.394-17.661-14.266Zm208.591-191.442c1.355 6.116 0 12.226-6.126 12.913l-10.182 2.028V281.164c-8.839 4.751-16.99 7.467-23.782 7.467-10.875 0-13.598-3.397-21.744-13.575L149.467 170.513V271.662l21.072 4.755s0 12.214-17.001 12.214l-46.868 2.718c-1.362-2.718 0-9.501 4.754-10.861l12.23-3.389V143.362l-16.982-1.361c-1.361-6.115 2.031-14.933 11.549-15.618l50.28-3.389 69.303 105.904V135.212l-17.669-2.028c-1.357-7.477 4.071-12.906 10.866-13.579l46.893-2.729Z" fill="black"/></svg>
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.1em">Notion Dashboard</div>
+      </div>
+
+      <h2 style="text-align:left;font-size:clamp(22px,3vw,40px);margin-bottom:12px">
+        Не GetCourse.<br><span class="grad">Твой личный дашборд</span>
+      </h2>
+      <p style="font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:24px;max-width:420px">
+        Каждый ученик получает персональную страницу в Notion — живую, красивую, под себя. Никаких безликих «личных кабинетов».
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);display:flex;align-items:center;justify-content:center;font-size:15px">📅</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff">Ближайший урок + Zoom</div><div style="font-size:12px;color:var(--muted)">Ссылка на занятие всегда под рукой</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);display:flex;align-items:center;justify-content:center;font-size:15px">🔴</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff">汉分 и уровень</div><div style="font-size:12px;color:var(--muted)">Прогресс-бар, очки, следующий ранг</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);display:flex;align-items:center;justify-content:center;font-size:15px">✅</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff">ДЗ + AI-оценка</div><div style="font-size:12px;color:var(--muted)">История заданий, статус, балл от AI</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2);display:flex;align-items:center;justify-content:center;font-size:15px">🎙</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff">Все записи уроков</div><div style="font-size:12px;color:var(--muted)">Пересмотри любой урок в 1 клик</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 8 — TELEGRAM MINI APP -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s8">
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="cn-deco" style="top:-40px;right:-30px">游</div>
+
+  <div style="display:flex;align-items:center;gap:24px;width:100%;max-width:1080px;position:relative;z-index:1">
+
+    <!-- ── Три телефона ─────────────────────────────── -->
+    <div style="display:flex;gap:10px;flex-shrink:0;align-items:flex-start">
+
+      <!-- Phone 1: Прогресс -->
+      <div style="width:152px;background:#17212b;border-radius:28px;border:2px solid #2a3a4a;overflow:hidden;box-shadow:0 20px 56px rgba(0,0,0,.8);font-family:'Inter',sans-serif">
+        <!-- status bar -->
+        <div style="background:#17212b;padding:7px 10px 0;display:flex;justify-content:space-between">
+          <span style="font-size:7px;color:rgba(255,255,255,.35)">23:44</span>
+          <span style="font-size:7px;color:rgba(255,255,255,.35)">●●● 30</span>
+        </div>
+        <!-- header -->
+        <div style="background:#17212b;padding:5px 10px 7px;border-bottom:1px solid #1e2c3a">
+          <div style="font-size:10px;font-weight:800;color:#fff">Ян <span style="font-weight:400;color:rgba(255,255,255,.4)">· 🔥 7 дней</span></div>
+          <div style="font-size:7px;color:rgba(255,255,255,.35);margin-top:1px">LELE LAB</div>
+        </div>
+        <!-- tabs -->
+        <div style="display:flex;border-bottom:1px solid #1e2c3a;background:#17212b">
+          <div style="flex:1;padding:5px 0;text-align:center;font-size:7px;font-weight:700;color:#22d3ee;border-bottom:2px solid #22d3ee">Прогресс</div>
+          <div style="flex:1;padding:5px 0;text-align:center;font-size:7px;color:rgba(255,255,255,.3)">История</div>
+          <div style="flex:1;padding:5px 0;text-align:center;font-size:7px;color:rgba(255,255,255,.3)">Топ</div>
+        </div>
+        <!-- content -->
+        <div style="padding:8px 10px;background:#0e1621">
+          <!-- circular widget -->
+          <div style="display:flex;justify-content:center;margin-bottom:8px">
+            <div style="width:74px;height:74px;border-radius:50%;background:conic-gradient(#6366f1 0%,#22d3ee 47%,#1e2c3a 47%);display:flex;align-items:center;justify-content:center;position:relative">
+              <div style="width:58px;height:58px;border-radius:50%;background:#0e1621;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                <div style="font-size:15px;font-weight:900;color:#fff;line-height:1">470</div>
+                <div style="font-size:6px;color:rgba(255,255,255,.5);margin-top:1px">汉分</div>
+                <div style="font-size:7px;color:#22d3ee;margin-top:1px">🐣 LVL 2</div>
+              </div>
+            </div>
+          </div>
+          <!-- до след уровня -->
+          <div style="margin-bottom:7px">
+            <div style="font-size:6px;color:rgba(255,255,255,.4);margin-bottom:2px">До 学生 ещё 330 汉分</div>
+            <div style="background:#1e2c3a;border-radius:3px;height:4px;overflow:hidden">
+              <div style="width:59%;height:100%;background:linear-gradient(90deg,#6366f1,#22d3ee)"></div>
+            </div>
+          </div>
+          <!-- stats row -->
+          <div style="display:flex;gap:4px;margin-bottom:7px">
+            <div style="flex:1;background:#1e2c3a;border-radius:6px;padding:4px 5px;text-align:center">
+              <div style="font-size:8px;font-weight:700;color:#fbbf24">—</div>
+              <div style="font-size:5.5px;color:rgba(255,255,255,.35);margin-top:1px">Скидка</div>
+            </div>
+            <div style="flex:1;background:#1e2c3a;border-radius:6px;padding:4px 5px;text-align:center">
+              <div style="font-size:8px;font-weight:700;color:#22d3ee">#1</div>
+              <div style="font-size:5.5px;color:rgba(255,255,255,.35);margin-top:1px">В топе</div>
+            </div>
+          </div>
+          <!-- action cards -->
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="background:#1e2c3a;border-radius:6px;padding:5px 7px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:7px;color:#e2e8f0">📝 Сдать ДЗ</span>
+              <span style="font-size:7px;font-weight:700;color:#4ade80">+30…+75</span>
+            </div>
+            <div style="background:#1e2c3a;border-radius:6px;padding:5px 7px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:7px;color:#e2e8f0">👥 Привести друга</span>
+              <span style="font-size:7px;font-weight:700;color:#fbbf24">+1000</span>
+            </div>
+          </div>
+          <!-- levels path -->
+          <div style="margin-top:7px;background:#1e2c3a;border-radius:6px;padding:5px 7px">
+            <div style="font-size:6px;color:rgba(255,255,255,.4);margin-bottom:4px">Путь уровней</div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="text-align:center"><div style="font-size:8px">🥚</div><div style="font-size:5px;color:rgba(255,255,255,.35)">蛋</div></div>
+              <div style="flex:1;height:1px;background:linear-gradient(90deg,#6366f1,#22d3ee);margin:0 2px"></div>
+              <div style="text-align:center"><div style="font-size:8px;background:rgba(34,211,238,.2);border-radius:4px;padding:1px 2px">🐣</div><div style="font-size:5px;color:#22d3ee">雛</div></div>
+              <div style="flex:1;height:1px;background:#2a3a4a;margin:0 2px"></div>
+              <div style="text-align:center"><div style="font-size:8px">🐥</div><div style="font-size:5px;color:rgba(255,255,255,.35)">学生</div></div>
+              <div style="flex:1;height:1px;background:#2a3a4a;margin:0 2px"></div>
+              <div style="text-align:center"><div style="font-size:8px">🦅</div><div style="font-size:5px;color:rgba(255,255,255,.35)">达人</div></div>
+              <div style="flex:1;height:1px;background:#2a3a4a;margin:0 2px"></div>
+              <div style="text-align:center"><div style="font-size:8px">🐉</div><div style="font-size:5px;color:rgba(255,255,255,.35)">大神</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone 2: Топ (смещён вниз) -->
+      <div style="width:152px;background:#17212b;border-radius:28px;border:2px solid #2a3a4a;overflow:hidden;box-shadow:0 20px 56px rgba(0,0,0,.8);font-family:'Inter',sans-serif;margin-top:24px">
+        <div style="background:#17212b;padding:7px 10px 0;display:flex;justify-content:space-between">
+          <span style="font-size:7px;color:rgba(255,255,255,.35)">23:44</span>
+          <span style="font-size:7px;color:rgba(255,255,255,.35)">●●● 30</span>
+        </div>
+        <div style="background:#17212b;padding:5px 10px 7px;border-bottom:1px solid #1e2c3a">
+          <div style="font-size:10px;font-weight:800;color:#fff">Ян <span style="font-weight:400;color:rgba(255,255,255,.4)">· 🔥 7 дней</span></div>
+          <div style="font-size:7px;color:rgba(255,255,255,.35);margin-top:1px">LELE LAB</div>
+        </div>
+        <div style="display:flex;border-bottom:1px solid #1e2c3a;background:#17212b">
+          <div style="flex:1;padding:5px 0;text-align:center;font-size:7px;color:rgba(255,255,255,.3)">Прогресс</div>
+          <div style="flex:1;padding:5px 0;text-align:center;font-size:7px;color:rgba(255,255,255,.3)">История</div>
+          <div style="flex:1;padding:5px 0;text-align:center;font-size:7px;font-weight:700;color:#22d3ee;border-bottom:2px solid #22d3ee">Топ</div>
+        </div>
+        <div style="padding:8px 10px;background:#0e1621">
+          <!-- header -->
+          <div style="margin-bottom:6px">
+            <div style="font-size:9px;font-weight:800;color:#fff">Топ учеников</div>
+            <div style="font-size:6px;color:rgba(255,255,255,.35)">6 учеников · обновлено только что</div>
+          </div>
+          <!-- toggle -->
+          <div style="display:flex;background:#1e2c3a;border-radius:6px;padding:2px;margin-bottom:8px">
+            <div style="flex:1;background:linear-gradient(90deg,#6366f1,#22d3ee);border-radius:5px;text-align:center;font-size:6px;font-weight:700;color:#fff;padding:3px 0">Эта неделя</div>
+            <div style="flex:1;text-align:center;font-size:6px;color:rgba(255,255,255,.35);padding:3px 0">Всё время</div>
+          </div>
+          <!-- podium -->
+          <div style="display:flex;align-items:flex-end;justify-content:center;gap:4px;margin-bottom:8px">
+            <!-- #2 -->
+            <div style="text-align:center">
+              <div style="font-size:16px">🥈</div>
+              <div style="font-size:7px;font-weight:600;color:#e2e8f0">Лия</div>
+              <div style="height:22px;width:36px;background:rgba(148,163,184,.2);border-radius:4px 4px 0 0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px">
+                <span style="font-size:6px;color:#94a3b8">#2</span>
+              </div>
+            </div>
+            <!-- #1 -->
+            <div style="text-align:center">
+              <div style="font-size:18px">🥇</div>
+              <div style="font-size:7px;font-weight:700;color:#fbbf24">Ян</div>
+              <div style="height:32px;width:40px;background:rgba(251,191,36,.2);border-radius:4px 4px 0 0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px">
+                <span style="font-size:6px;color:#fbbf24">#1</span>
+              </div>
+            </div>
+            <!-- #3 -->
+            <div style="text-align:center">
+              <div style="font-size:14px">🥉</div>
+              <div style="font-size:7px;font-weight:600;color:#e2e8f0">Дарый</div>
+              <div style="height:16px;width:36px;background:rgba(180,120,60,.2);border-radius:4px 4px 0 0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px">
+                <span style="font-size:6px;color:#cd7f32">#3</span>
+              </div>
+            </div>
+          </div>
+          <!-- list -->
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;align-items:center;gap:6px;background:#1e2c3a;border-radius:5px;padding:4px 6px">
+              <span style="font-size:7px;color:rgba(255,255,255,.4);width:10px">#4</span>
+              <span style="font-size:7px;color:#e2e8f0">Лиза</span>
+              <span style="font-size:7px;margin-left:auto;color:rgba(255,255,255,.4)">🥚 0</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:#1e2c3a;border-radius:5px;padding:4px 6px">
+              <span style="font-size:7px;color:rgba(255,255,255,.4);width:10px">#5</span>
+              <span style="font-size:7px;color:#e2e8f0">Анастасия</span>
+              <span style="font-size:7px;margin-left:auto;color:rgba(255,255,255,.4)">🥚 0</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:#1e2c3a;border-radius:5px;padding:4px 6px">
+              <span style="font-size:7px;color:rgba(255,255,255,.4);width:10px">#6</span>
+              <span style="font-size:7px;color:#e2e8f0">Алиса</span>
+              <span style="font-size:7px;margin-left:auto;color:rgba(255,255,255,.4)">🥚 0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone 3: История -->
+      <div style="width:152px;background:#17212b;border-radius:28px;border:2px solid #2a3a4a;overflow:hidden;box-shadow:0 20px 56px rgba(0,0,0,.8);font-family:'Inter',sans-serif">
+        <div style="background:#17212b;padding:7px 10px 0;display:flex;justify-content:space-between">
+          <span style="font-size:7px;color:rgba(255,255,255,.35)">23:44</span>
+          <span style="font-size:7px;color:rgba(255,255,255,.35)">●●● 30</span>
+        </div>
+        <div style="background:#17212b;padding:5px 10px 7px;border-bottom:1px solid #1e2c3a">
+          <div style="font-size:10px;font-weight:800;color:#fff">Ян <span style="font-weight:400;color:rgba(255,255,255,.4)">· 🔥 7 дней</span></div>
+          <div style="font-size:7px;color:rgba(255,255,255,.35);margin-top:1px">LELE LAB</div>
+        </div>
+        <div style="display:flex;border-bottom:1px solid #1e2c3a;background:#17212b">
+          <div style="flex:1;padding:5px 0;text-align:center;font-size:7px;color:rgba(255,255,255,.3)">Прогресс</div>
+          <div style="flex:1;padding:5px 0;text-align:center;font-size:7px;font-weight:700;color:#22d3ee;border-bottom:2px solid #22d3ee">История</div>
+          <div style="flex:1;padding:5px 0;text-align:center;font-size:7px;color:rgba(255,255,255,.3)">Топ</div>
+        </div>
+        <div style="padding:8px 10px;background:#0e1621">
+          <!-- header -->
+          <div style="margin-bottom:6px">
+            <div style="font-size:9px;font-weight:800;color:#fff">История начислений</div>
+            <div style="background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.2);border-radius:6px;padding:3px 7px;display:inline-flex;align-items:center;gap:4px;margin-top:3px">
+              <span style="font-size:8px;font-weight:700;color:#22d3ee">За неделю +470 汉分</span>
+            </div>
+          </div>
+          <!-- filters -->
+          <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:8px">
+            <span style="font-size:6px;background:linear-gradient(90deg,#6366f1,#22d3ee);color:#fff;padding:2px 5px;border-radius:4px;font-weight:700">Всё</span>
+            <span style="font-size:6px;background:#1e2c3a;color:rgba(255,255,255,.4);padding:2px 5px;border-radius:4px">Уроки</span>
+            <span style="font-size:6px;background:#1e2c3a;color:rgba(255,255,255,.4);padding:2px 5px;border-radius:4px">ДЗ</span>
+            <span style="font-size:6px;background:#1e2c3a;color:rgba(255,255,255,.4);padding:2px 5px;border-radius:4px">Тесты</span>
+          </div>
+          <!-- timeline -->
+          <div style="display:flex;flex-direction:column;gap:0">
+            <!-- day 1 -->
+            <div style="font-size:6px;color:rgba(255,255,255,.3);margin-bottom:4px;padding-left:2px">3 дня назад</div>
+            <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:7px">
+              <div style="background:#1e2c3a;border-radius:6px;padding:5px 7px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:7px;font-weight:600;color:#e2e8f0">🎓 Урок 09.05 Еда</div>
+                  <div style="font-size:6px;color:rgba(255,255,255,.35)">Уроки</div>
+                </div>
+                <span style="font-size:8px;font-weight:700;color:#4ade80">+50</span>
+              </div>
+              <div style="background:#1e2c3a;border-radius:6px;padding:5px 7px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:7px;font-weight:600;color:#e2e8f0">📝 ДЗ Пиньинь бонус</div>
+                  <div style="font-size:6px;color:rgba(255,255,255,.35)">ДЗ</div>
+                </div>
+                <span style="font-size:8px;font-weight:700;color:#4ade80">+30</span>
+              </div>
+              <div style="background:#1e2c3a;border-radius:6px;padding:5px 7px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:7px;font-weight:600;color:#e2e8f0">📝 ДЗ Пиньинь база</div>
+                  <div style="font-size:6px;color:rgba(255,255,255,.35)">ДЗ</div>
+                </div>
+                <span style="font-size:8px;font-weight:700;color:#4ade80">+30</span>
+              </div>
+            </div>
+            <!-- day 2 -->
+            <div style="font-size:6px;color:rgba(255,255,255,.3);margin-bottom:4px;padding-left:2px">4 дня назад</div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="background:#1e2c3a;border-radius:6px;padding:5px 7px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:7px;font-weight:600;color:#e2e8f0">🎓 Урок 08.05</div>
+                  <div style="font-size:6px;color:rgba(255,255,255,.35)">Уроки</div>
+                </div>
+                <span style="font-size:8px;font-weight:700;color:#4ade80">+50</span>
+              </div>
+              <div style="background:#1e2c3a;border-radius:6px;padding:5px 7px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-size:7px;font-weight:600;color:#e2e8f0">📝 ДЗ Тоны</div>
+                  <div style="font-size:6px;color:rgba(255,255,255,.35)">ДЗ</div>
+                </div>
+                <span style="font-size:8px;font-weight:700;color:#4ade80">+30</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Правая часть: copy ───────────────────────── -->
+    <div style="flex:1;min-width:0">
+      <!-- Telegram badge -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div style="width:28px;height:28px;background:linear-gradient(135deg,#2AABEE,#229ED9);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">✈️</div>
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.1em">Telegram Mini App</div>
+      </div>
+
+      <h2 style="text-align:left;font-size:clamp(20px,2.8vw,38px);margin-bottom:12px">
+        Учёба — это<br><span class="grad">игра, которую<br>хочется выигрывать</span>
+      </h2>
+      <p style="font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:22px;max-width:380px">
+        Мини-приложение прямо в Telegram. Никаких сторонних платформ — всё там, где ты уже сидишь.
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);display:flex;align-items:center;justify-content:center;font-size:15px">🔴</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff">汉分 — баллы за каждый шаг</div><div style="font-size:12px;color:var(--muted)">+50 за урок, +30–75 за ДЗ. Копишь — растёшь.</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);display:flex;align-items:center;justify-content:center;font-size:15px">🏆</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff">Рейтинг группы в реальном времени</div><div style="font-size:12px;color:var(--muted)">Кто лучший ученик недели? Соревнуйся.</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);display:flex;align-items:center;justify-content:center;font-size:15px">🎁</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff">Скидки на следующий пакет</div><div style="font-size:12px;color:var(--muted)">1 000 汉分 → 3% · 3 000 → 5% · 7 000 → 7% · 12 000 → 10%</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.2);display:flex;align-items:center;justify-content:center;font-size:15px">📈</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff">5 уровней: от 🥚 蛋 до 🐉 大神</div><div style="font-size:12px;color:var(--muted)">Каждый уровень — бонус +200 汉分 и новый статус</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 9 — ЦЕНА -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s9">
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="cn-deco" style="top:-30px;right:-20px">价</div>
+
+  <div class="tag">Летняя скидка</div>
+  <h2>Твоё место в группе</h2>
+
+  <div class="price-card">
+    <div style="position:relative;overflow:hidden;border-radius:16px;margin-bottom:0">
+
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">
+        <div style="font-size:13px;color:var(--muted);text-decoration:line-through">20 999 ₽</div>
+        <div style="background:rgba(34,211,238,.15);border:1px solid rgba(34,211,238,.3);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700;color:var(--v3)">☀️ Летняя скидка −24%</div>
+      </div>
+      <div class="price-label">Групповой пакет · 8 занятий</div>
+      <div class="price-main grad">15 990 ₽</div>
+      <div class="price-sub">= 1 999 ₽ за урок &nbsp;·&nbsp; 2 раза в неделю</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px">С осени цена вернётся к 20 999 ₽</div>
+
+      <div class="price-divider"></div>
+
+      <div class="price-items">
+        <div class="price-item"><span class="price-item-icon">✓</span>8 групповых уроков (60 мин)</div>
+        <div class="price-item"><span class="price-item-icon">✓</span>Видеоуроки теории от Лии</div>
+        <div class="price-item"><span class="price-item-icon">✓</span>Разговорные встречи с носителями</div>
+        <div class="price-item"><span class="price-item-icon">✓</span>AI инфраструктура — проверка тонов, практика и ДЗ 24/7</div>
+        <div class="price-item"><span class="price-item-icon">✓</span>Домашние задания + чат с преподавателем</div>
+        <div class="price-item"><span class="price-item-icon">✓</span>Запись каждого урока</div>
+        <div class="price-item"><span class="price-item-icon">✓</span>Личный дашборд с прогрессом</div>
+        <div class="price-item"><span class="price-item-icon">✓</span>Telegram Mini App + система 汉分 (баллы за прогресс)</div>
+      </div>
+
+      <div class="price-divider"></div>
+
+      <div style="font-size:13px;color:var(--muted);text-align:center;line-height:1.6">
+        🔒 Место в группе — 4 человека максимум.<br>
+        Свободных мест сейчас: <strong style="color:var(--v3)">3</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 10 — CTA -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s10">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="cn-deco" style="bottom:-40px;right:-30px">始</div>
+
+  <span class="emoji-big">🚀</span>
+  <div class="tag">Финал</div>
+  <h1>Начни прямо<br><span class="grad">сегодня</span></h1>
+  <p class="sub">Место в группе держим <strong style="color:#fff">48 часов</strong>.<br>
+  Потом оно уходит следующему — и старт без тебя.</p>
+
+  <!-- stats -->
+  <div style="position:relative;z-index:1;margin-top:20px;display:flex;gap:32px;flex-wrap:wrap;justify-content:center">
+    <div style="text-align:center">
+      <div style="font-size:22px;font-weight:800" class="grad">15 990 ₽</div>
+      <div style="font-size:12px;color:var(--muted)">за месяц (8 уроков)</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:22px;font-weight:800" class="grad">1 999 ₽</div>
+      <div style="font-size:12px;color:var(--muted)">за один урок</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:22px;font-weight:800" class="grad">48ч</div>
+      <div style="font-size:12px;color:var(--muted)">держим место</div>
+    </div>
+  </div>
+
+  <!-- checkbox + pay button -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:0;position:relative;z-index:1;margin-top:24px">
+
+    <!-- checkbox -->
+    <label id="ofertaLabel" style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;max-width:420px;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);transition:border-color .2s">
+      <input type="checkbox" id="ofertaCheck" onchange="togglePayBtn()" style="width:16px;height:16px;margin-top:2px;accent-color:#22d3ee;flex-shrink:0;cursor:pointer">
+      <span style="font-size:13px;color:var(--muted);line-height:1.55">
+        Я принимаю условия
+        <a href="/oferta.html" target="_blank" style="color:var(--v3);text-decoration:underline;text-underline-offset:2px">публичной оферты</a>
+        и
+        <a href="/privacy.html" target="_blank" style="color:var(--v3);text-decoration:underline;text-underline-offset:2px">политики конфиденциальности</a>
+      </span>
+    </label>
+
+    <!-- pay button -->
+    <button id="payBtn" disabled onclick="handlePay()"
+      style="margin-top:16px;padding:18px 56px;border-radius:999px;border:none;cursor:not-allowed;
+             background:rgba(255,255,255,.1);color:rgba(255,255,255,.3);
+             font-size:18px;font-weight:700;font-family:'Inter',sans-serif;
+             box-shadow:none;transition:all .3s;position:relative;z-index:1">
+      Оплатить 15 990 ₽
+    </button>
+
+    <div style="font-size:12px;color:var(--muted);margin-top:14px;text-align:center;line-height:1.6">
+      Есть вопросы? <a href="https://t.me/leleikaa" target="_blank" style="color:var(--v3)">@leleikaa</a>
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<!-- ── PROGRESS DOTS ─────────────────────────────────── -->
+<div class="progress" id="progress"></div>
+
+<!-- ── NAV ────────────────────────────────────────────── -->
+<div class="nav left">
+  <button class="nav-btn" id="btnPrev" onclick="changeSlide(-1)">←</button>
+</div>
+<div class="nav right">
+  <button class="nav-btn" id="btnNext" onclick="changeSlide(1)">→</button>
+</div>
+
+<script>
+const TOTAL = 10;
+let cur = 1;
+
+function getSlide(n){ return document.getElementById('s'+n) }
+
+function changeSlide(dir){
+  const next = cur + dir;
+  if(next < 1 || next > TOTAL) return;
+  getSlide(cur).classList.remove('active');
+  getSlide(cur).classList.add('exit');
+  setTimeout(()=>{ getSlide(cur).classList.remove('exit') }, 500);
+  cur = next;
+  getSlide(cur).classList.add('active');
+  updateUI();
+}
+
+function goTo(n){
+  if(n === cur) return;
+  getSlide(cur).classList.remove('active');
+  cur = n;
+  getSlide(cur).classList.add('active');
+  updateUI();
+}
+
+function updateUI(){
+  document.getElementById('slideNum').textContent = cur + ' / ' + TOTAL;
+  document.querySelectorAll('.dot').forEach((d,i)=>{
+    d.classList.toggle('active', i+1 === cur);
+  });
+  document.getElementById('btnPrev').style.opacity = cur===1 ? '0.3' : '1';
+  document.getElementById('btnNext').style.opacity = cur===TOTAL ? '0.3' : '1';
+}
+
+// Build dots
+const prog = document.getElementById('progress');
+for(let i=1;i<=TOTAL;i++){
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===1?' active':'');
+  d.onclick = ()=>goTo(i);
+  prog.appendChild(d);
+}
+
+// Keyboard
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='ArrowDown') changeSlide(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') changeSlide(-1);
+});
+
+// Touch swipe
+let tx=0;
+document.addEventListener('touchstart',e=>{ tx=e.touches[0].clientX },{ passive:true });
+document.addEventListener('touchend',e=>{
+  const dx = e.changedTouches[0].clientX - tx;
+  if(Math.abs(dx)>50) changeSlide(dx<0?1:-1);
+},{ passive:true });
+
+updateUI();
+
+// ── ОПЛАТА ────────────────────────────────────────────
+function togglePayBtn(){
+  const checked = document.getElementById('ofertaCheck').checked;
+  const btn = document.getElementById('payBtn');
+  const label = document.getElementById('ofertaLabel');
+  if(checked){
+    btn.disabled = false;
+    btn.style.cursor = 'pointer';
+    btn.style.background = 'linear-gradient(135deg,var(--v1),var(--v2),var(--v3))';
+    btn.style.color = '#fff';
+    btn.style.boxShadow = '0 8px 32px rgba(99,102,241,.4)';
+    label.style.borderColor = 'rgba(34,211,238,.35)';
+  } else {
+    btn.disabled = true;
+    btn.style.cursor = 'not-allowed';
+    btn.style.background = 'rgba(255,255,255,.1)';
+    btn.style.color = 'rgba(255,255,255,.3)';
+    btn.style.boxShadow = 'none';
+    label.style.borderColor = 'rgba(255,255,255,.1)';
+  }
+}
+
+const PAYMENT_URL = 'https://b2b.cbrpay.ru/BS1B004UCE2FC5UN8LORNT6B9FURGUBV';
+
+function handlePay(){
+  if(!document.getElementById('ofertaCheck').checked) return;
+  window.open(PAYMENT_URL, '_blank');
+}
+</script>
+</body>
+</html>
