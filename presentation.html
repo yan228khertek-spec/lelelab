@@ -1156,12 +1156,66 @@ function togglePayBtn(){
   }
 }
 
-const PAYMENT_URL = 'https://b2b.cbrpay.ru/BS1B004UCE2FC5UN8LORNT6B9FURGUBV';
+const PROXY_URL = 'https://ianramzay.app.n8n.cloud/webhook/lelelab/tbank-init';
+const AMOUNT = 1599000; // 15 990 ₽ в копейках
 
-function handlePay(){
+async function handlePay(){
   if(!document.getElementById('ofertaCheck').checked) return;
-  window.open(PAYMENT_URL, '_blank');
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Создаём платёж...';
+  btn.style.opacity = '0.7';
+
+  try {
+    const orderId = 'LELE-GROUP-' + Date.now();
+    const res = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: AMOUNT,
+        description: 'LELE LAB — Групповой пакет 8 занятий',
+        orderId,
+        successUrl: window.location.origin + '/presentation.html?payment=success&order=' + orderId,
+        failUrl: window.location.origin + '/presentation.html?payment=fail&order=' + orderId
+      })
+    });
+    const rawText = await res.text();
+    if(!rawText) throw new Error('Нет ответа от сервера');
+    const data = JSON.parse(rawText);
+    if(data.success && data.paymentUrl){
+      window.location.href = data.paymentUrl;
+    } else {
+      throw new Error(data.error || 'Ошибка создания платежа');
+    }
+  } catch(e){
+    btn.textContent = '❌ ' + e.message;
+    btn.style.opacity = '1';
+    btn.style.background = 'rgba(239,68,68,.2)';
+    btn.style.color = '#fca5a5';
+    btn.style.boxShadow = 'none';
+    setTimeout(()=>{
+      btn.textContent = 'Оплатить 15 990 ₽';
+      btn.disabled = false;
+      btn.style.background = 'linear-gradient(135deg,var(--v1),var(--v2),var(--v3))';
+      btn.style.color = '#fff';
+      btn.style.boxShadow = '0 8px 32px rgba(99,102,241,.4)';
+      btn.style.opacity = '1';
+    }, 3000);
+  }
 }
+
+// Показать результат после редиректа
+(function(){
+  const p = new URLSearchParams(location.search);
+  if(p.get('payment') === 'success'){
+    setTimeout(()=>{ goTo(10); }, 100);
+    const btn = document.getElementById('payBtn');
+    if(btn){ btn.textContent = '✅ Оплата прошла!'; btn.style.background='rgba(34,197,94,.2)'; btn.style.color='#86efac'; }
+  }
+  if(p.get('payment') === 'fail'){
+    setTimeout(()=>{ goTo(10); }, 100);
+  }
+})();
 </script>
 </body>
 </html>
