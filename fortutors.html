@@ -680,7 +680,7 @@
 
 <script>
   const BOT_TOKEN = '8620946003:AAGwXF1clHi2KJbM5DSQ_mNfBX-V7wAEv8w';
-  const CHAT_ID   = '1291657098';
+  const CHAT_IDS  = ['1291657098', '949443389']; // Ian + Лия
 
   // ── File drop zone ──
   const fileDrop  = document.getElementById('fileDrop');
@@ -742,25 +742,29 @@
       `🔗 Источник: lelelab.ru/fortutors`;
 
     try {
-      // 1. Send text message
-      const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: 'HTML' })
-      });
-      const data = await res.json();
-      if (!data.ok) throw new Error(data.description || 'Telegram error');
-
-      // 2. Send CV file if attached
-      if (cvFile) {
-        const fd = new FormData();
-        fd.append('chat_id', CHAT_ID);
-        fd.append('document', cvFile, cvFile.name);
-        fd.append('caption', `📎 Резюме от ${name} (${tg})`);
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+      // 1. Send text message to all recipients
+      const results = await Promise.all(CHAT_IDS.map(cid =>
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
           method: 'POST',
-          body: fd
-        });
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: cid, text, parse_mode: 'HTML' })
+        }).then(r => r.json())
+      ));
+      const firstFail = results.find(d => !d.ok);
+      if (firstFail) throw new Error(firstFail.description || 'Telegram error');
+
+      // 2. Send CV file if attached (to all recipients)
+      if (cvFile) {
+        await Promise.all(CHAT_IDS.map(cid => {
+          const fd = new FormData();
+          fd.append('chat_id', cid);
+          fd.append('document', cvFile, cvFile.name);
+          fd.append('caption', `📎 Резюме от ${name} (${tg})`);
+          return fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+            method: 'POST',
+            body: fd
+          });
+        }));
       }
 
       msg.className = 'form-msg success';
