@@ -1028,7 +1028,7 @@
       <div style="font-size:12px;color:var(--muted)">за один урок</div>
     </div>
     <div style="text-align:center">
-      <div style="font-size:22px;font-weight:800" class="grad">48ч</div>
+      <div id="timerDisplay" style="font-size:22px;font-weight:800;background:linear-gradient(90deg,var(--v1),var(--v3));-webkit-background-clip:text;-webkit-text-fill-color:transparent">48:00:00</div>
       <div style="font-size:12px;color:var(--muted)">держим место</div>
     </div>
   </div>
@@ -1215,6 +1215,28 @@ async function handlePay(){
   if(p.get('payment') === 'fail'){
     setTimeout(()=>{ goTo(10); }, 100);
   }
+})();
+
+// ── ТАЙМЕР 48 ЧАСОВ ────────────────────────────────────
+(function(){
+  const KEY = 'lele_deadline';
+  if(!localStorage.getItem(KEY)){
+    localStorage.setItem(KEY, Date.now() + 48*60*60*1000);
+  }
+  function tick(){
+    const remaining = Math.max(0, parseInt(localStorage.getItem(KEY)) - Date.now());
+    const h = Math.floor(remaining/3600000);
+    const m = Math.floor((remaining%3600000)/60000);
+    const s = Math.floor((remaining%60000)/1000);
+    const el = document.getElementById('timerDisplay');
+    if(el){
+      el.textContent = remaining > 0
+        ? String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')
+        : 'Время вышло';
+    }
+    if(remaining > 0) setTimeout(tick, 1000);
+  }
+  tick();
 })();
 </script>
 </body>
