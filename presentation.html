@@ -223,12 +223,124 @@
   }
 
   @media(max-width:768px){
-    .slide{padding:32px 24px}
-    .vs-wrap{flex-direction:column}
-    .liya-wrap{flex-direction:column;text-align:center}
-    .liya-points{align-items:center}
-    .cards{flex-direction:column;align-items:center}
-    .price-card{padding:32px 24px}
+    /* ── CORE SLIDE ──────────────────────────────────────── */
+    .slide{
+      padding:64px 18px 92px;
+      overflow-y:auto;
+      overflow-x:hidden;
+      -webkit-overflow-scrolling:touch;
+      justify-content:flex-start;
+    }
+
+    /* ── FIXED UI ─────────────────────────────────────────  */
+    .logo{font-size:15px;left:14px;top:14px}
+    .slide-num{right:14px;top:14px;font-size:11px}
+    .nav.left{left:10px;bottom:14px}
+    .nav.right{right:10px;bottom:14px}
+    .nav-btn{width:38px;height:38px;font-size:15px}
+    .progress{bottom:20px;gap:5px}
+    .dot{width:6px;height:6px}
+    .dot.active{width:16px}
+
+    /* ── TYPOGRAPHY ──────────────────────────────────────── */
+    .emoji-big{font-size:44px;margin-bottom:4px}
+    .sub{font-size:14px;margin-top:10px}
+    .tag{margin-bottom:10px;font-size:11px;padding:5px 12px}
+    h2{font-size:clamp(22px,7vw,30px)}
+
+    /* ── CARDS (слайд 3) ─────────────────────────────────── */
+    .cards{flex-direction:column;align-items:stretch;margin-top:16px;gap:10px}
+    .card{min-width:unset;max-width:100%;padding:16px 14px}
+    .card p{font-size:13px}
+    .card h4{font-size:15px}
+    .card-icon{font-size:28px;margin-bottom:8px}
+
+    /* ── VS BLOCK (слайд 2) ──────────────────────────────── */
+    .vs-wrap{flex-direction:column;gap:10px;margin-top:16px}
+    .vs-col{padding:18px 14px}
+    .vs-badge{display:none}
+
+    /* ── LIYA (слайд 4) ─────────────────────────────────── */
+    .liya-wrap{flex-direction:column;text-align:center;gap:14px;margin-top:16px}
+    .liya-avatar{width:84px;height:84px;margin:0 auto}
+    .liya-points{align-items:flex-start}
+    .liya-point{font-size:13px}
+    .liya-name{font-size:20px}
+
+    /* ── CHECKLIST (слайд 5) ─────────────────────────────── */
+    .checklist{gap:8px;margin-top:14px}
+    .check-text{font-size:13px}
+    .check-item{gap:10px}
+    .check-icon{width:24px;height:24px;font-size:11px}
+
+    /* ── PRICE CARD (слайд 9) ────────────────────────────── */
+    .price-card{padding:22px 16px;margin-top:12px}
+    .price-main{font-size:clamp(38px,11vw,52px)}
+    .price-sub{font-size:13px}
+    .price-items{gap:7px;margin:16px 0}
+    .price-item{font-size:13px}
+    .price-divider{margin:14px 0}
+
+    /* ── СЛАЙДЫ 6, 7, 8: скрыть телефоны, стакнуть layout ── */
+    /* Внешний flex-контейнер → в колонку */
+    #s6>div[style*="display:flex"],
+    #s7>div[style*="display:flex"],
+    #s8>div[style*="display:flex"]{
+      flex-direction:column !important;
+      gap:16px !important;
+      align-items:flex-start !important;
+      max-width:100% !important;
+    }
+    /* Скрыть блоки с телефонами (первый child) */
+    #s6>div[style*="display:flex"]>div:first-child,
+    #s7>div[style*="display:flex"]>div:first-child,
+    #s8>div[style*="display:flex"]>div:first-child{
+      display:none !important;
+    }
+    /* Текстовый блок — на всю ширину */
+    #s6>div[style*="display:flex"]>div:last-child,
+    #s7>div[style*="display:flex"]>div:last-child,
+    #s8>div[style*="display:flex"]>div:last-child{
+      width:100% !important;
+      min-width:0 !important;
+    }
+    /* h2 внутри слайдов 6-8 */
+    #s6 h2,#s7 h2,#s8 h2{
+      font-size:clamp(20px,6vw,28px) !important;
+      text-align:left !important;
+      margin-bottom:8px !important;
+    }
+    /* sub-text внутри слайдов 6-8 */
+    #s6>div[style*="display:flex"]>div:last-child>p,
+    #s7>div[style*="display:flex"]>div:last-child>p,
+    #s8>div[style*="display:flex"]>div:last-child>p{
+      font-size:13px !important;
+      max-width:100% !important;
+      margin-bottom:16px !important;
+    }
+    /* Feature items внутри слайдов 6-8 */
+    #s6>div[style*="display:flex"]>div:last-child>div>div,
+    #s7>div[style*="display:flex"]>div:last-child>div>div,
+    #s8>div[style*="display:flex"]>div:last-child>div>div{
+      gap:10px !important;
+    }
+
+    /* ── СЛАЙД 10 CTA ────────────────────────────────────── */
+    /* Stats row */
+    #s10>div[style*="display:flex"]{
+      gap:16px !important;
+      margin-top:14px !important;
+    }
+    /* Кнопка оплаты — на всю ширину */
+    #payBtn{
+      width:100% !important;
+      padding:16px 24px !important;
+      font-size:16px !important;
+    }
+    /* Чекбокс — на всю ширину */
+    #ofertaLabel{
+      max-width:100% !important;
+    }
   }
 </style>
 </head>
