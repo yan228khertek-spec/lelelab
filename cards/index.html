@@ -213,7 +213,7 @@ function previewIvl(st,g){
 }
 
 /* ── ХРАНИЛИЩЕ ──────────────────────────────────────────────────── */
-const KEY = 'lele_cards_v3' + (CHAT_ID?('_'+CHAT_ID):'');
+const KEY = 'lele_cards_v4' + (CHAT_ID?('_'+CHAT_ID):'');
 function loadState(){ try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};} }
 function saveState(s){ try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){} }
 let STATE = loadState();
@@ -287,14 +287,14 @@ function renderStudy(){
   if(s.pos>=s.queue.length){ renderDone(); return; }
   const deck=s.deck, card=deck.cards.find(c=>c.id===s.queue[s.pos]);
   const st=(STATE[deck.id]||{})[card.id];
-  const pct=Math.round((s.done.size/s.total)*100);
+  const pct=Math.round((s.pos/s.total)*100);
 
   app.innerHTML=`
    <div class="study">
     <div class="sbar">
       <button class="x" id="close">✕</button>
       <div class="prog"><i style="width:${pct}%"></i></div>
-      <div class="cnt">${s.done.size}/${s.total}</div>
+      <div class="cnt">${s.pos+1}/${s.total}</div>
     </div>
     <div class="stage">
       <div class="swiper" id="swiper">
@@ -376,8 +376,7 @@ function commitGrade(g){
   STATE[deck.id][cid]=schedule(STATE[deck.id][cid],g);
   saveState(STATE);
   s.reviewed++;
-  if(g===1){ s.queue.push(cid); s.again++; s.done.delete(cid); }
-  else { s.done.add(cid); }
+  if(g!==1) s.done.add(cid);   // ✕ НЕ возвращает карту в эту сессию — повтор в следующий заход (FSRS)
   s.pos++;
   renderStudy();
 }
