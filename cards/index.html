@@ -80,7 +80,7 @@
     background:var(--card);padding:5px 11px;border-radius:999px;}
   .fllabel{position:absolute;top:18px;right:18px;font-size:11px;font-weight:700;color:var(--muted);
     display:flex;align-items:center;gap:4px;}
-  .hanzi{font-size:88px;font-weight:500;line-height:1.05;letter-spacing:1px;}
+  .hanzi{font-size:88px;font-weight:400;line-height:1.12;letter-spacing:1px;}
   .pinyin{font-size:30px;font-weight:700;color:var(--blue);}
   .pos{display:inline-block;margin:14px 0 8px;font-size:12px;font-weight:800;color:var(--teal);
     background:var(--tealBg);padding:4px 10px;border-radius:999px;}
@@ -139,25 +139,37 @@ const DECKS = [
     id:'hsk4-lesson-01', hsk:4, lesson:1,
     title:'Урок 1 · 简单的爱情', subtitle:'Простая любовь',
     cards:[
-      {id:'01',hanzi:'法律',pinyin:'fǎlǜ',pos:'сущ.',ru:'закон; право'},
-      {id:'02',hanzi:'俩',pinyin:'liǎ',pos:'числ.',ru:'двое; оба'},
-      {id:'03',hanzi:'印象',pinyin:'yìnxiàng',pos:'сущ.',ru:'впечатление'},
-      {id:'04',hanzi:'深',pinyin:'shēn',pos:'прил.',ru:'глубокий'},
-      {id:'05',hanzi:'熟悉',pinyin:'shúxī',pos:'глаг.',ru:'быть знакомым; хорошо знать'},
-      {id:'06',hanzi:'不仅',pinyin:'bùjǐn',pos:'союз',ru:'не только'},
-      {id:'07',hanzi:'性格',pinyin:'xìnggé',pos:'сущ.',ru:'характер; личность'},
-      {id:'08',hanzi:'开玩笑',pinyin:'kāi wánxiào',pos:'',ru:'шутить; подшучивать'},
-      {id:'09',hanzi:'从来',pinyin:'cónglái',pos:'нареч.',ru:'всегда; (с отриц.) никогда'},
-      {id:'10',hanzi:'最好',pinyin:'zuìhǎo',pos:'нареч.',ru:'лучше всего; желательно'},
-      {id:'11',hanzi:'共同',pinyin:'gòngtóng',pos:'прил.',ru:'общий; совместный'},
-      {id:'12',hanzi:'适合',pinyin:'shìhé',pos:'глаг.',ru:'подходить; годиться'},
-      {id:'13',hanzi:'幸福',pinyin:'xìngfú',pos:'прил.',ru:'счастливый; счастье'},
-      {id:'14',hanzi:'生活',pinyin:'shēnghuó',pos:'сущ./глаг.',ru:'жизнь; жить'},
-      {id:'15',hanzi:'刚',pinyin:'gāng',pos:'нареч.',ru:'только что; едва'},
-      {id:'16',hanzi:'浪漫',pinyin:'làngmàn',pos:'прил.',ru:'романтичный'},
-      {id:'17',hanzi:'够',pinyin:'gòu',pos:'глаг.',ru:'хватать; быть достаточным'},
-      {id:'18',hanzi:'缺点',pinyin:'quēdiǎn',pos:'сущ.',ru:'недостаток; минус'},
-      {id:'19',hanzi:'接受',pinyin:'jiēshòu',pos:'глаг.',ru:'принимать'},
+      {id:'01',hanzi:'深',pinyin:'shēn',ru:'глубокий'},
+      {id:'02',hanzi:'熟悉',pinyin:'shúxī',ru:'хорошо знать, быть знакомым'},
+      {id:'03',hanzi:'不仅',pinyin:'bùjǐn',ru:'не только'},
+      {id:'04',hanzi:'性格',pinyin:'xìnggé',ru:'характер, личность'},
+      {id:'05',hanzi:'也 / 还 / 而且',pinyin:'yě / hái / érqiě',ru:'также, ещё, более того (обычно со словом 不仅)'},
+      {id:'06',hanzi:'开玩笑',pinyin:'kāi wánxiào',ru:'шутить'},
+      {id:'07',hanzi:'从来',pinyin:'cónglái',ru:'всегда / никогда (с отрицанием)'},
+      {id:'08',hanzi:'最好',pinyin:'zuìhǎo',ru:'лучше всего, лучше бы'},
+      {id:'09',hanzi:'共同',pinyin:'gòngtóng',ru:'общий, совместный'},
+      {id:'10',hanzi:'适合',pinyin:'shìhé',ru:'подходить, соответствовать'},
+      {id:'11',hanzi:'幸福',pinyin:'xìngfú',ru:'счастливый, счастье'},
+      {id:'12',hanzi:'生活',pinyin:'shēnghuó',ru:'жизнь, жить'},
+      {id:'13',hanzi:'刚',pinyin:'gāng',ru:'только что'},
+      {id:'14',hanzi:'浪漫',pinyin:'làngmàn',ru:'романтичный'},
+      {id:'15',hanzi:'够',pinyin:'gòu',ru:'достаточно'},
+      {id:'16',hanzi:'缺点',pinyin:'quēdiǎn',ru:'недостаток, изъян'},
+      {id:'17',hanzi:'接受',pinyin:'jiēshòu',ru:'принимать'},
+      {id:'18',hanzi:'羡慕',pinyin:'xiànmù',ru:'завидовать'},
+      {id:'19',hanzi:'爱情',pinyin:'àiqíng',ru:'любовь'},
+      {id:'20',hanzi:'星星',pinyin:'xīngxing',ru:'звезда'},
+      {id:'21',hanzi:'即使...也...',pinyin:'jíshǐ... yě...',ru:'даже если'},
+      {id:'22',hanzi:'加班',pinyin:'jiābān',ru:'работать сверхурочно'},
+      {id:'23',hanzi:'亮',pinyin:'liàng',ru:'светлый, яркий'},
+      {id:'24',hanzi:'感动',pinyin:'gǎndòng',ru:'тронуть, взволновать'},
+      {id:'25',hanzi:'自然',pinyin:'zìrán',ru:'природа, естественно'},
+      {id:'26',hanzi:'原因',pinyin:'yuányīn',ru:'причина'},
+      {id:'27',hanzi:'互相',pinyin:'hùxiāng',ru:'взаимно'},
+      {id:'28',hanzi:'吸引',pinyin:'xīyǐn',ru:'привлекать'},
+      {id:'29',hanzi:'幽默',pinyin:'yōumò',ru:'юмор, юмористический'},
+      {id:'30',hanzi:'脾气',pinyin:'píqi',ru:'характер, темперамент'},
+      {id:'31',hanzi:'简单',pinyin:'jiǎndān',ru:'простой'},
     ]
   },
 ];
@@ -198,7 +210,7 @@ function previewIvl(st,g){
 }
 
 /* ── ХРАНИЛИЩЕ ──────────────────────────────────────────────────── */
-const KEY = 'lele_cards_v1' + (CHAT_ID?('_'+CHAT_ID):'');
+const KEY = 'lele_cards_v2' + (CHAT_ID?('_'+CHAT_ID):'');
 function loadState(){ try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};} }
 function saveState(s){ try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){} }
 let STATE = loadState();
@@ -264,6 +276,9 @@ function startSession(deckId){
   renderStudy();
 }
 
+function hzSize(t){ const n=(t||'').replace(/\s/g,'').length;
+  if(n<=2) return 92; if(n<=3) return 74; if(n<=5) return 54; if(n<=8) return 40; return 30; }
+
 function renderStudy(){
   const s=session;
   if(s.pos>=s.queue.length){ renderDone(); return; }
@@ -286,7 +301,7 @@ function renderStudy(){
           <div class="face front">
             <span class="tag">HSK ${deck.hsk} · ${st?'повтор':'новое'}</span>
             <span class="fllabel">↻ тап</span>
-            <div class="hanzi hz">${card.hanzi}</div>
+            <div class="hanzi hz" style="font-size:${hzSize(card.hanzi)}px">${card.hanzi}</div>
           </div>
           <div class="face back">
             <span class="tag">${card.hanzi}</span>
