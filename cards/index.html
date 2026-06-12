@@ -80,7 +80,7 @@
     background:var(--card);padding:5px 11px;border-radius:999px;}
   .fllabel{position:absolute;top:18px;right:18px;font-size:11px;font-weight:700;color:var(--muted);
     display:flex;align-items:center;gap:4px;}
-  .hanzi{font-size:88px;font-weight:900;line-height:1.05;letter-spacing:1px;}
+  .hanzi{font-size:88px;font-weight:500;line-height:1.05;letter-spacing:1px;}
   .pinyin{font-size:30px;font-weight:700;color:var(--blue);}
   .pos{display:inline-block;margin:14px 0 8px;font-size:12px;font-weight:800;color:var(--teal);
     background:var(--tealBg);padding:4px 10px;border-radius:999px;}
@@ -333,12 +333,13 @@ function bindSwipe(){
     }
   };
   const onUp=()=>{ if(!down)return; down=false;
-    const quick=Date.now()-t0<250;
-    if(!dragging){ // тап → флип
-      if(Math.abs(dx)<8) flipper.classList.toggle('flipped');
-      return;
+    // тап (малое смещение) → флип, даже если палец чуть дёрнулся
+    if(Math.abs(dx)<30 && Math.abs(dy)<30){
+      flipper.classList.toggle('flipped');
+      swiper.classList.add('snap'); swiper.style.transform='';
+      vno.style.opacity=0; vyes.style.opacity=0; return;
     }
-    if(Math.abs(dx)>110){ const g=dx<0?1:3; flyAndGrade(g,dx<0?-1:1); return; }
+    if(Math.abs(dx)>100){ const g=dx<0?1:3; flyAndGrade(g,dx<0?-1:1); return; }
     // снап назад
     swiper.classList.add('snap'); swiper.style.transform='';
     vno.style.opacity=0; vyes.style.opacity=0;
