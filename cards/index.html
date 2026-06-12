@@ -242,9 +242,9 @@ function renderHome(){
             stroke-dasharray="${CC}" stroke-dashoffset="${off}" transform="rotate(-90 26 26)"/>
           <text x="26" y="30" text-anchor="middle" font-size="13" font-weight="800" fill="#3a4174">${pct}</text>
         </svg></div>
-        <div class="ttl"><b>${d.title}</b><span>${d.subtitle} · ${d.cards.length} слов</span></div>
-        <div class="due">${due>0?`<div class="n">${due}</div><div class="l">к повтору</div>`
-          :`<div class="n" style="color:var(--green)">✓</div><div class="l">готово</div>`}</div>
+        <div class="ttl"><b>${d.title}</b></div>
+        <div class="due">${due>0?`<div class="n">${due}</div>`
+          :`<div class="n" style="color:var(--green)">✓</div>`}</div>
       </div>`;
     }
   }
