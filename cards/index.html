@@ -275,7 +275,7 @@ function startSession(deckId){
   if(!queue.length) queue=deck.cards.slice();
   const newIds=new Set(queue.filter(c=>!ds[c.id]).map(c=>c.id));
   session={ deck, queue:queue.map(c=>c.id), pos:0, total:queue.length,
-            reviewed:0, newWords:newIds.size, again:0 };
+            reviewed:0, newWords:newIds.size, again:0, done:new Set() };
   renderStudy();
 }
 
@@ -287,14 +287,14 @@ function renderStudy(){
   if(s.pos>=s.queue.length){ renderDone(); return; }
   const deck=s.deck, card=deck.cards.find(c=>c.id===s.queue[s.pos]);
   const st=(STATE[deck.id]||{})[card.id];
-  const pct=Math.round((s.reviewed/(s.total+s.again))*100);
+  const pct=Math.round((s.done.size/s.total)*100);
 
   app.innerHTML=`
    <div class="study">
     <div class="sbar">
       <button class="x" id="close">✕</button>
       <div class="prog"><i style="width:${pct}%"></i></div>
-      <div class="cnt">${s.reviewed}/${s.total+s.again}</div>
+      <div class="cnt">${s.done.size}/${s.total}</div>
     </div>
     <div class="stage">
       <div class="swiper" id="swiper">
@@ -376,7 +376,8 @@ function commitGrade(g){
   STATE[deck.id][cid]=schedule(STATE[deck.id][cid],g);
   saveState(STATE);
   s.reviewed++;
-  if(g===1){ s.queue.push(cid); s.again++; }
+  if(g===1){ s.queue.push(cid); s.again++; s.done.delete(cid); }
+  else { s.done.add(cid); }
   s.pos++;
   renderStudy();
 }
