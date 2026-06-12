@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<title>LELE 汉卡</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --ink:#1d2347; --ink2:#3a4174; --muted:#8a91b6;
+    --line:#eef0fa; --card:#f7f8ff;
+    --blue:#3b82f6; --indigo:#6366f1; --cyan:#22d3ee;
+    --teal:#0f8b7c; --tealBg:#eafff8;
+    --gold:#ffb938; --goldBg:#fff6e4;
+    --rose:#ff4d7d; --roseBg:#fff0f3; --green:#16b364; --greenBg:#e7faf0;
+    --r:22px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;background:var(--bg);overflow:hidden;}
+  body{font-family:-apple-system,"SF Pro Text",system-ui,"Segoe UI",sans-serif;
+    color:var(--ink);-webkit-font-smoothing:antialiased;}
+  #app{height:100%;display:flex;flex-direction:column;max-width:520px;margin:0 auto;}
+  .hz{font-family:"Noto Sans SC","PingFang SC",serif;}
+  .scroll{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .scroll::-webkit-scrollbar{display:none;}
+  button{font-family:inherit;border:none;cursor:pointer;background:none;color:inherit;}
+  .fade{animation:fade .28s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .pop{animation:pop .32s cubic-bezier(.2,.9,.3,1.3);}
+  @keyframes pop{from{opacity:0;transform:scale(.92);}to{opacity:1;transform:none;}}
+
+  /* ── HEADER ── */
+  .top{padding:54px 20px 10px;display:flex;align-items:center;justify-content:space-between;}
+  .top h1{font-size:26px;font-weight:900;letter-spacing:-.6px;}
+  .pill{display:flex;align-items:center;gap:6px;background:var(--goldBg);color:#b27300;
+    padding:7px 13px;border-radius:999px;font-weight:800;font-size:14px;}
+
+  /* ── DECK LIST ── */
+  .lvl{padding:22px 20px 6px;font-size:13px;font-weight:800;color:var(--muted);
+    letter-spacing:.4px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+  .lvl .dot{width:7px;height:7px;border-radius:50%;}
+  .deck{margin:8px 16px;padding:18px;background:var(--card);border-radius:var(--r);
+    display:flex;align-items:center;gap:16px;border:1px solid var(--line);transition:transform .12s;}
+  .deck:active{transform:scale(.985);}
+  .deck .ring{position:relative;width:52px;height:52px;flex:none;}
+  .deck .ttl{flex:1;min-width:0;}
+  .deck .ttl b{font-size:16px;font-weight:800;display:block;letter-spacing:-.2px;}
+  .deck .ttl span{font-size:13px;color:var(--muted);font-weight:600;}
+  .deck .due{flex:none;text-align:right;}
+  .deck .due .n{font-size:20px;font-weight:900;color:var(--blue);line-height:1;}
+  .deck .due .l{font-size:11px;color:var(--muted);font-weight:700;}
+
+  /* ── STUDY ── */
+  .study{flex:1;display:flex;flex-direction:column;}
+  .sbar{padding:54px 18px 6px;display:flex;align-items:center;gap:12px;}
+  .x{width:34px;height:34px;border-radius:50%;background:var(--card);font-size:17px;
+    color:var(--ink2);display:flex;align-items:center;justify-content:center;flex:none;}
+  .prog{flex:1;height:6px;background:var(--line);border-radius:99px;overflow:hidden;}
+  .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--indigo),var(--cyan));
+    border-radius:99px;transition:width .35s ease;}
+  .cnt{font-size:13px;font-weight:800;color:var(--muted);flex:none;min-width:42px;text-align:right;}
+
+  .stage{flex:1;display:flex;align-items:center;justify-content:center;padding:14px 20px;
+    perspective:1400px;position:relative;}
+  .swiper{width:100%;height:368px;position:relative;touch-action:pan-y;cursor:grab;
+    transform-style:preserve-3d;}
+  .swiper.snap{transition:transform .32s cubic-bezier(.2,.8,.3,1);}
+  .flipper{position:absolute;inset:0;transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.4,.15,.2,1);}
+  .flipper.flipped{transform:rotateY(180deg);}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    background:#fff;border:1px solid var(--line);border-radius:30px;
+    box-shadow:0 18px 50px -28px rgba(60,65,116,.45);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:34px 24px;text-align:center;}
+  .face.back{transform:rotateY(180deg);}
+  .tag{position:absolute;top:18px;left:18px;font-size:12px;font-weight:800;color:var(--muted);
+    background:var(--card);padding:5px 11px;border-radius:999px;}
+  .fllabel{position:absolute;top:18px;right:18px;font-size:11px;font-weight:700;color:var(--muted);
+    display:flex;align-items:center;gap:4px;}
+  .hanzi{font-size:88px;font-weight:900;line-height:1.05;letter-spacing:1px;}
+  .pinyin{font-size:30px;font-weight:700;color:var(--blue);}
+  .pos{display:inline-block;margin:14px 0 8px;font-size:12px;font-weight:800;color:var(--teal);
+    background:var(--tealBg);padding:4px 10px;border-radius:999px;}
+  .ru{font-size:22px;font-weight:600;color:var(--ink2);margin-top:2px;padding:0 6px;}
+
+  /* swipe verdict badges */
+  .verdict{position:absolute;top:26px;width:72px;height:72px;border-radius:50%;
+    font-size:38px;font-weight:900;line-height:1;border:3px solid;opacity:0;
+    display:flex;align-items:center;justify-content:center;
+    transition:opacity .12s;pointer-events:none;z-index:3;}
+  .verdict.no{left:24px;color:var(--rose);border-color:var(--rose);transform:rotate(-12deg) scale(.8);}
+  .verdict.yes{right:24px;color:var(--green);border-color:var(--green);transform:rotate(12deg) scale(.8);}
+
+  /* ── ACTIONS ── */
+  .acts{padding:6px 16px calc(20px + env(safe-area-inset-bottom));}
+  .hintrow{text-align:center;font-size:15px;color:var(--muted);font-weight:700;margin-bottom:12px;letter-spacing:2px;}
+  .grade2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .g{padding:16px 4px;border-radius:18px;font-size:28px;font-weight:800;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+    border:1.5px solid transparent;transition:transform .1s;}
+  .g:active{transform:scale(.96);}
+  .g.again{background:var(--roseBg);color:var(--rose);border-color:#ffd7e1;}
+  .g.good{background:var(--greenBg);color:var(--green);border-color:#bdefd3;}
+
+  /* ── DONE ── */
+  .done{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:30px 28px;text-align:center;gap:6px;}
+  .done .em{font-size:64px;}
+  .done h2{font-size:26px;font-weight:900;margin-top:6px;}
+  .done p{color:var(--muted);font-weight:600;font-size:15px;}
+  .stats{display:flex;gap:12px;margin:24px 0 8px;width:100%;}
+  .stat{flex:1;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 8px;}
+  .stat .v{font-size:24px;font-weight:900;}
+  .stat .k{font-size:12px;color:var(--muted);font-weight:700;margin-top:2px;}
+  .hf{color:var(--gold);}
+  .btn2{margin-top:18px;width:100%;padding:16px;border-radius:16px;font-weight:800;font-size:16px;
+    background:var(--card);color:var(--ink);border:1px solid var(--line);}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   LELE LAB — Карточки (Telegram Mini App)
+   FSRS-5 · свайпы (Quizlet-style) · 3D-флип · 汉分 через n8n
+   ════════════════════════════════════════════════════════════════ */
+const TG  = window.Telegram?.WebApp;
+const API = 'https://ianramzay.app.n8n.cloud/webhook';
+const CHAT_ID = TG?.initDataUnsafe?.user?.id || null;
+const DAY = 86400000;
+
+/* ── КОЛОДЫ (ранжируются по hsk) ────────────────────────────────── */
+const DECKS = [
+  {
+    id:'hsk4-lesson-01', hsk:4, lesson:1,
+    title:'Урок 1 · 简单的爱情', subtitle:'Простая любовь',
+    cards:[
+      {id:'01',hanzi:'法律',pinyin:'fǎlǜ',pos:'сущ.',ru:'закон; право'},
+      {id:'02',hanzi:'俩',pinyin:'liǎ',pos:'числ.',ru:'двое; оба'},
+      {id:'03',hanzi:'印象',pinyin:'yìnxiàng',pos:'сущ.',ru:'впечатление'},
+      {id:'04',hanzi:'深',pinyin:'shēn',pos:'прил.',ru:'глубокий'},
+      {id:'05',hanzi:'熟悉',pinyin:'shúxī',pos:'глаг.',ru:'быть знакомым; хорошо знать'},
+      {id:'06',hanzi:'不仅',pinyin:'bùjǐn',pos:'союз',ru:'не только'},
+      {id:'07',hanzi:'性格',pinyin:'xìnggé',pos:'сущ.',ru:'характер; личность'},
+      {id:'08',hanzi:'开玩笑',pinyin:'kāi wánxiào',pos:'',ru:'шутить; подшучивать'},
+      {id:'09',hanzi:'从来',pinyin:'cónglái',pos:'нареч.',ru:'всегда; (с отриц.) никогда'},
+      {id:'10',hanzi:'最好',pinyin:'zuìhǎo',pos:'нареч.',ru:'лучше всего; желательно'},
+      {id:'11',hanzi:'共同',pinyin:'gòngtóng',pos:'прил.',ru:'общий; совместный'},
+      {id:'12',hanzi:'适合',pinyin:'shìhé',pos:'глаг.',ru:'подходить; годиться'},
+      {id:'13',hanzi:'幸福',pinyin:'xìngfú',pos:'прил.',ru:'счастливый; счастье'},
+      {id:'14',hanzi:'生活',pinyin:'shēnghuó',pos:'сущ./глаг.',ru:'жизнь; жить'},
+      {id:'15',hanzi:'刚',pinyin:'gāng',pos:'нареч.',ru:'только что; едва'},
+      {id:'16',hanzi:'浪漫',pinyin:'làngmàn',pos:'прил.',ru:'романтичный'},
+      {id:'17',hanzi:'够',pinyin:'gòu',pos:'глаг.',ru:'хватать; быть достаточным'},
+      {id:'18',hanzi:'缺点',pinyin:'quēdiǎn',pos:'сущ.',ru:'недостаток; минус'},
+      {id:'19',hanzi:'接受',pinyin:'jiēshòu',pos:'глаг.',ru:'принимать'},
+    ]
+  },
+];
+const LVL_COLOR = {1:'#22c55e',2:'#22d3ee',3:'#3b82f6',4:'#6366f1',5:'#a855f7',6:'#ec4899'};
+
+/* ── FSRS-5 ─────────────────────────────────────────────────────── */
+const W = [0.40255,1.18385,3.173,15.69105,7.1949,0.5345,1.4604,0.0046,1.54575,
+           0.1192,1.01925,1.9395,0.11,0.29605,2.2698,0.2315,2.9898,0.51655,0.6621];
+const REQ_R = 0.9, FACTOR = 19/81, DECAY = -0.5;
+const clampD = d => Math.min(Math.max(d,1),10);
+const initS = g => Math.max(W[g-1],0.1);
+const initD = g => clampD(W[4] - Math.exp(W[5]*(g-1)) + 1);
+function nextD(D,g){ let d = D + (-W[6]*(g-3))*(10-D)/9; d = W[7]*initD(4) + (1-W[7])*d; return clampD(d); }
+const R = (t,S) => Math.pow(1 + FACTOR*t/S, DECAY);
+function nextS(D,S,r,g){
+  if(g===1){ const sf = W[11]*Math.pow(D,-W[12])*(Math.pow(S+1,W[13])-1)*Math.exp(W[14]*(1-r));
+    return Math.max(Math.min(sf,S),0.1); }
+  const hard=g===2?W[15]:1, easy=g===4?W[16]:1;
+  const inc = Math.exp(W[8])*(11-D)*Math.pow(S,-W[9])*(Math.exp(W[10]*(1-r))-1)*hard*easy;
+  return Math.max(S*(1+inc),0.1);
+}
+const interval = S => Math.max(1,Math.round((S/FACTOR)*(Math.pow(REQ_R,1/DECAY)-1)));
+function schedule(st,g){
+  const now=Date.now(); let S,D;
+  if(!st||!st.reps){ S=initS(g); D=initD(g); }
+  else { const t=Math.max(0,(now-(st.last||now))/DAY); const r=R(t,st.S);
+    D=nextD(st.D,g); S=nextS(D,st.S,r,g); }
+  const ivl = g===1 ? 0 : interval(S);
+  return { S, D, reps:(st?.reps||0)+1, last:now, due:now+ivl*DAY, ivl };
+}
+function previewIvl(st,g){
+  if(g===1) return 'снова в сессии';
+  const d = schedule(st,g).ivl;
+  if(d<1) return '<1 дня';
+  if(d<30) return 'через '+d+'д';
+  if(d<365) return 'через '+Math.round(d/30)+'мес';
+  return 'через '+Math.round(d/365)+'г';
+}
+
+/* ── ХРАНИЛИЩЕ ──────────────────────────────────────────────────── */
+const KEY = 'lele_cards_v1' + (CHAT_ID?('_'+CHAT_ID):'');
+function loadState(){ try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};} }
+function saveState(s){ try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){} }
+let STATE = loadState();
+
+function dueCount(deck){ const ds=STATE[deck.id]||{}, now=Date.now(); let n=0;
+  for(const c of deck.cards){ const st=ds[c.id]; if(!st||st.due<=now) n++; } return n; }
+function deckProgress(deck){ const ds=STATE[deck.id]||{}; let l=0;
+  for(const c of deck.cards){ const st=ds[c.id]; if(st&&st.reps>0&&st.ivl>=1) l++; }
+  return l/deck.cards.length; }
+
+/* ── 汉分 через n8n ─────────────────────────────────────────────── */
+function awardHanfen(deckId, reviewed, newWords){
+  if(!CHAT_ID) return;
+  fetch(API+'/hanfen-cards',{ method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ chatId:CHAT_ID, deckId, reviewed, newWords }) }).catch(()=>{});
+}
+
+/* ════════════════════════════════════════════════════════════════ */
+const app = document.getElementById('app');
+let session = null;
+function totalHanfen(){ let n=0; for(const d in STATE){ if(d[0]==='_')continue;
+  for(const c in STATE[d]) n += (STATE[d][c].reps||0); } return n*2; }
+
+/* ── СПИСОК КОЛОД ────────────────────────────────────────────────── */
+function renderHome(){
+  session=null;
+  const byLvl={}; DECKS.forEach(d=>{(byLvl[d.hsk]=byLvl[d.hsk]||[]).push(d);});
+  const levels=Object.keys(byLvl).map(Number).sort((a,b)=>a-b);
+  let html=`<div class="top fade"><h1>LELE <span class="hz">汉卡</span></h1></div>
+    <div class="scroll" style="flex:1;padding-bottom:30px">`;
+  for(const lvl of levels){
+    const col=LVL_COLOR[lvl]||'#3b82f6';
+    html+=`<div class="lvl"><span class="dot" style="background:${col}"></span>HSK ${lvl}</div>`;
+    for(const d of byLvl[lvl]){
+      const due=dueCount(d), prog=deckProgress(d), pct=Math.round(prog*100);
+      const CC=32*Math.PI, off=CC*(1-prog);
+      html+=`<div class="deck" data-deck="${d.id}">
+        <div class="ring"><svg width="52" height="52" viewBox="0 0 52 52">
+          <circle cx="26" cy="26" r="16" fill="none" stroke="#eef0fa" stroke-width="5"/>
+          <circle cx="26" cy="26" r="16" fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round"
+            stroke-dasharray="${CC}" stroke-dashoffset="${off}" transform="rotate(-90 26 26)"/>
+          <text x="26" y="30" text-anchor="middle" font-size="13" font-weight="800" fill="#3a4174">${pct}</text>
+        </svg></div>
+        <div class="ttl"><b>${d.title}</b><span>${d.subtitle} · ${d.cards.length} слов</span></div>
+        <div class="due">${due>0?`<div class="n">${due}</div><div class="l">к повтору</div>`
+          :`<div class="n" style="color:var(--green)">✓</div><div class="l">готово</div>`}</div>
+      </div>`;
+    }
+  }
+  html+=`</div>`;
+  app.innerHTML=html;
+  app.querySelectorAll('.deck').forEach(el=>el.onclick=()=>{haptic('light');startSession(el.dataset.deck);});
+}
+
+/* ── СЕССИЯ ──────────────────────────────────────────────────────── */
+function startSession(deckId){
+  const deck=DECKS.find(d=>d.id===deckId), ds=STATE[deckId]||{}, now=Date.now();
+  let queue=deck.cards.filter(c=>{const st=ds[c.id];return !st||st.due<=now;});
+  if(!queue.length) queue=deck.cards.slice();
+  const newIds=new Set(queue.filter(c=>!ds[c.id]).map(c=>c.id));
+  session={ deck, queue:queue.map(c=>c.id), pos:0, total:queue.length,
+            reviewed:0, newWords:newIds.size, again:0 };
+  renderStudy();
+}
+
+function renderStudy(){
+  const s=session;
+  if(s.pos>=s.queue.length){ renderDone(); return; }
+  const deck=s.deck, card=deck.cards.find(c=>c.id===s.queue[s.pos]);
+  const st=(STATE[deck.id]||{})[card.id];
+  const pct=Math.round((s.reviewed/(s.total+s.again))*100);
+
+  app.innerHTML=`
+   <div class="study">
+    <div class="sbar">
+      <button class="x" id="close">✕</button>
+      <div class="prog"><i style="width:${pct}%"></i></div>
+      <div class="cnt">${s.reviewed}/${s.total+s.again}</div>
+    </div>
+    <div class="stage">
+      <div class="swiper" id="swiper">
+        <div class="verdict no" id="vno">✕</div>
+        <div class="verdict yes" id="vyes">✓</div>
+        <div class="flipper" id="flipper">
+          <div class="face front">
+            <span class="tag">HSK ${deck.hsk} · ${st?'повтор':'новое'}</span>
+            <span class="fllabel">↻ тап</span>
+            <div class="hanzi hz">${card.hanzi}</div>
+          </div>
+          <div class="face back">
+            <span class="tag">${card.hanzi}</span>
+            <div class="pinyin">${card.pinyin}</div>
+            ${card.pos?`<div class="pos">${card.pos}</div>`:''}
+            <div class="ru">${card.ru}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="acts">
+      <div class="grade2">
+        <button class="g again" data-g="1">✕</button>
+        <button class="g good"  data-g="3">✓</button>
+      </div>
+    </div>
+   </div>`;
+
+  document.getElementById('close').onclick=()=>{haptic('light');renderHome();};
+  app.querySelectorAll('.g').forEach(b=>b.onclick=()=>flyAndGrade(parseInt(b.dataset.g)));
+  bindSwipe();
+}
+
+/* ── СВАЙП + ФЛИП ────────────────────────────────────────────────── */
+function bindSwipe(){
+  const swiper=document.getElementById('swiper');
+  const flipper=document.getElementById('flipper');
+  const vno=document.getElementById('vno'), vyes=document.getElementById('vyes');
+  const W0=swiper.offsetWidth||320;
+  let down=false, sx=0, sy=0, dx=0, dy=0, t0=0, dragging=false;
+
+  const onDown=e=>{ down=true; dragging=false;
+    const p=e.touches?e.touches[0]:e; sx=p.clientX; sy=p.clientY; dx=dy=0; t0=Date.now();
+    swiper.classList.remove('snap');
+  };
+  const onMove=e=>{ if(!down)return;
+    const p=e.touches?e.touches[0]:e; dx=p.clientX-sx; dy=p.clientY-sy;
+    if(!dragging && Math.abs(dx)>8 && Math.abs(dx)>Math.abs(dy)) dragging=true;
+    if(dragging){ e.preventDefault();
+      swiper.style.transform=`translateX(${dx}px) rotate(${dx/22}deg)`;
+      const k=Math.min(Math.abs(dx)/120,1);
+      if(dx<0){ vno.style.opacity=k; vno.style.transform=`rotate(-12deg) scale(${.8+.2*k})`; vyes.style.opacity=0; }
+      else if(dx>0){ vyes.style.opacity=k; vyes.style.transform=`rotate(12deg) scale(${.8+.2*k})`; vno.style.opacity=0; }
+    }
+  };
+  const onUp=()=>{ if(!down)return; down=false;
+    const quick=Date.now()-t0<250;
+    if(!dragging){ // тап → флип
+      if(Math.abs(dx)<8) flipper.classList.toggle('flipped');
+      return;
+    }
+    if(Math.abs(dx)>110){ const g=dx<0?1:3; flyAndGrade(g,dx<0?-1:1); return; }
+    // снап назад
+    swiper.classList.add('snap'); swiper.style.transform='';
+    vno.style.opacity=0; vyes.style.opacity=0;
+  };
+
+  swiper.addEventListener('touchstart',onDown,{passive:true});
+  swiper.addEventListener('touchmove',onMove,{passive:false});
+  swiper.addEventListener('touchend',onUp);
+  swiper.addEventListener('mousedown',onDown);
+  window.addEventListener('mousemove',onMove);
+  window.addEventListener('mouseup',onUp);
+}
+
+function flyAndGrade(g,dir){
+  const swiper=document.getElementById('swiper');
+  if(swiper){ const d=dir||(g===1?-1:1);
+    swiper.classList.add('snap');
+    swiper.style.transform=`translateX(${d*window.innerWidth*1.1}px) rotate(${d*18}deg)`;
+    swiper.style.opacity='0';
+  }
+  haptic(g===1?'rigid':'soft');
+  setTimeout(()=>commitGrade(g),180);
+}
+function commitGrade(g){
+  const s=session, deck=s.deck, cid=s.queue[s.pos];
+  STATE[deck.id]=STATE[deck.id]||{};
+  STATE[deck.id][cid]=schedule(STATE[deck.id][cid],g);
+  saveState(STATE);
+  s.reviewed++;
+  if(g===1){ s.queue.push(cid); s.again++; }
+  s.pos++;
+  renderStudy();
+}
+
+/* ── ИТОГИ ───────────────────────────────────────────────────────── */
+function renderDone(){
+  const s=session;
+  app.innerHTML=`
+   <div class="done fade">
+     <div class="em pop">🎉</div><h2>Готово!</h2><p>${s.deck.title}</p>
+     <div class="stats">
+       <div class="stat"><div class="v">${s.reviewed}</div><div class="k">повторов</div></div>
+       <div class="stat"><div class="v">${s.newWords}</div><div class="k">новых слов</div></div>
+     </div>
+     <button class="btn2" id="home">К колодам</button>
+   </div>`;
+  haptic('success');
+  document.getElementById('home').onclick=()=>{haptic('light');renderHome();};
+}
+
+/* ── HAPTIC ──────────────────────────────────────────────────────── */
+function haptic(t){ try{ const h=TG?.HapticFeedback; if(!h)return;
+  if(t==='success') h.notificationOccurred('success'); else h.impactOccurred(t); }catch(e){} }
+
+/* ── INIT ────────────────────────────────────────────────────────── */
+if(TG){ TG.ready(); TG.expand(); try{TG.setHeaderColor('#ffffff');TG.setBackgroundColor('#ffffff');}catch(e){} }
+renderHome();
+</script>
+</body>
+</html>
