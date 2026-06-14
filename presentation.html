@@ -285,7 +285,8 @@
     /* Внешний flex-контейнер → в колонку */
     #s6>div[style*="display:flex"],
     #s7>div[style*="display:flex"],
-    #s8>div[style*="display:flex"]{
+    #s8>div[style*="display:flex"],
+    #s9>div[style*="display:flex"]{
       flex-direction:column !important;
       gap:16px !important;
       align-items:flex-start !important;
@@ -294,40 +295,44 @@
     /* Скрыть блоки с телефонами (первый child) */
     #s6>div[style*="display:flex"]>div:first-child,
     #s7>div[style*="display:flex"]>div:first-child,
-    #s8>div[style*="display:flex"]>div:first-child{
+    #s8>div[style*="display:flex"]>div:first-child,
+    #s9>div[style*="display:flex"]>div:first-child{
       display:none !important;
     }
     /* Текстовый блок — на всю ширину */
     #s6>div[style*="display:flex"]>div:last-child,
     #s7>div[style*="display:flex"]>div:last-child,
-    #s8>div[style*="display:flex"]>div:last-child{
+    #s8>div[style*="display:flex"]>div:last-child,
+    #s9>div[style*="display:flex"]>div:last-child{
       width:100% !important;
       min-width:0 !important;
     }
-    /* h2 внутри слайдов 6-8 */
-    #s6 h2,#s7 h2,#s8 h2{
+    /* h2 внутри слайдов 6-9 */
+    #s6 h2,#s7 h2,#s8 h2,#s9 h2{
       font-size:clamp(20px,6vw,28px) !important;
       text-align:left !important;
       margin-bottom:8px !important;
     }
-    /* sub-text внутри слайдов 6-8 */
+    /* sub-text внутри слайдов 6-9 */
     #s6>div[style*="display:flex"]>div:last-child>p,
     #s7>div[style*="display:flex"]>div:last-child>p,
-    #s8>div[style*="display:flex"]>div:last-child>p{
+    #s8>div[style*="display:flex"]>div:last-child>p,
+    #s9>div[style*="display:flex"]>div:last-child>p{
       font-size:13px !important;
       max-width:100% !important;
       margin-bottom:16px !important;
     }
-    /* Feature items внутри слайдов 6-8 */
+    /* Feature items внутри слайдов 6-9 */
     #s6>div[style*="display:flex"]>div:last-child>div>div,
     #s7>div[style*="display:flex"]>div:last-child>div>div,
-    #s8>div[style*="display:flex"]>div:last-child>div>div{
+    #s8>div[style*="display:flex"]>div:last-child>div>div,
+    #s9>div[style*="display:flex"]>div:last-child>div>div{
       gap:10px !important;
     }
 
     /* ── СЛАЙД 10 CTA ────────────────────────────────────── */
     /* Stats row */
-    #s10>div[style*="display:flex"]{
+    #s14>div[style*="display:flex"]{
       gap:16px !important;
       margin-top:14px !important;
     }
@@ -347,7 +352,7 @@
 <body>
 
 <div class="logo">LELE LAB</div>
-<div class="slide-num" id="slideNum">1 / 10</div>
+<div class="slide-num" id="slideNum">1 / 14</div>
 
 <!-- ════════════════════════════════════════════════════ -->
 <!-- SLIDE 1 — HOOK -->
@@ -362,6 +367,7 @@
   <div class="tag">Добро пожаловать</div>
   <h1>Ты только что<br><span class="grad">почувствовал(а),</span><br>как это работает</h1>
   <p class="sub">Этот урок — не случайность<br>Это методика, которая делает китайский понятным с первого занятия</p>
+  <p class="sub" style="margin-top:12px;font-size:15px;color:rgba(255,255,255,.72)">А дальше — HSK, свободный разговор и поездка в Китай.<br><span class="grad" style="font-weight:800">С гарантией результата.</span></p>
 </div>
 
 <!-- ════════════════════════════════════════════════════ -->
@@ -494,6 +500,14 @@
     <div class="check-item">
       <div class="check-icon">🤖</div>
       <div class="check-text"><strong>AI-агент</strong> — проверка тонов, практика произношения, проверка ДЗ 24/7</div>
+    </div>
+    <div class="check-item">
+      <div class="check-icon">🀄</div>
+      <div class="check-text"><strong>LELE 汉卡 — карточки слов</strong> — умное повторение (FSRS) под каждый урок, прямо в Telegram</div>
+    </div>
+    <div class="check-item">
+      <div class="check-icon">🛡️</div>
+      <div class="check-text"><strong>Гарантия сдачи HSK</strong> — доводим до результата через допуск; не готов — дообучаем бесплатно</div>
     </div>
     <div class="check-item">
       <div class="check-icon">📝</div>
@@ -1073,9 +1087,198 @@
 </div>
 
 <!-- ════════════════════════════════════════════════════ -->
-<!-- SLIDE 9 — ЦЕНА -->
+<!-- SLIDE 9 — LELE 汉卡 (КАРТОЧКИ) -->
 <!-- ════════════════════════════════════════════════════ -->
 <div class="slide" id="s9">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="cn-deco" style="top:-40px;left:-30px">卡</div>
+
+  <div style="display:flex;align-items:center;gap:32px;width:100%;max-width:1060px;position:relative;z-index:1">
+
+    <!-- ── Два белых телефона ───────────────────────── -->
+    <div style="display:flex;gap:16px;flex-shrink:0">
+
+      <!-- Phone 1: список колод -->
+      <div style="width:190px;background:#fff;border-radius:36px;border:2px solid #e2e8f0;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.7);font-family:'Inter',sans-serif">
+        <div style="padding:8px 14px 0;display:flex;justify-content:space-between">
+          <span style="font-size:8px;color:#94a3b8;font-weight:600">21:38</span>
+          <span style="font-size:8px;color:#94a3b8">📶 78</span>
+        </div>
+        <div style="padding:10px 14px 14px">
+          <div style="font-size:18px;font-weight:900;color:#1e293b;margin-bottom:12px">LELE <span style="color:#3b82f6">汉卡</span></div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+            <span style="width:6px;height:6px;border-radius:50%;background:#6366f1"></span>
+            <span style="font-size:9px;font-weight:700;color:#94a3b8;letter-spacing:.05em">HSK 4</span>
+          </div>
+          <!-- lesson rows -->
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <div style="background:#f1f5f9;border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+              <div style="width:26px;height:26px;border-radius:50%;background:conic-gradient(#6366f1 65%,#e2e8f0 0);display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:19px;height:19px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#1e293b">18</div></div>
+              <span style="flex:1;font-size:8.5px;font-weight:700;color:#1e293b">Урок 1 · 简单的爱情</span>
+              <span style="font-size:11px;font-weight:900;color:#3b82f6">28</span>
+            </div>
+            <div style="background:#f1f5f9;border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+              <div style="width:26px;height:26px;border-radius:50%;background:#6366f1;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="font-size:7px;font-weight:800;color:#fff">100</div></div>
+              <span style="flex:1;font-size:8.5px;font-weight:700;color:#1e293b">Урок 2 · 真正的朋友</span>
+              <span style="font-size:11px;color:#22c55e;font-weight:900">✓</span>
+            </div>
+            <div style="background:#f1f5f9;border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+              <div style="width:26px;height:26px;border-radius:50%;background:conic-gradient(#6366f1 55%,#e2e8f0 0);display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:19px;height:19px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#1e293b">55</div></div>
+              <span style="flex:1;font-size:8.5px;font-weight:700;color:#1e293b">Урок 3 · 经理对我…</span>
+              <span style="font-size:11px;font-weight:900;color:#3b82f6">14</span>
+            </div>
+            <div style="background:#f1f5f9;border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:8px">
+              <div style="width:26px;height:26px;border-radius:50%;background:conic-gradient(#6366f1 8%,#e2e8f0 0);display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:19px;height:19px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#1e293b">6</div></div>
+              <span style="flex:1;font-size:8.5px;font-weight:700;color:#1e293b">Урок 4 · 好久没见了</span>
+              <span style="font-size:11px;font-weight:900;color:#3b82f6">33</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone 2: карточка -->
+      <div style="width:190px;background:#fff;border-radius:36px;border:2px solid #e2e8f0;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.7);font-family:'Inter',sans-serif;margin-top:28px">
+        <div style="padding:8px 14px 0;display:flex;justify-content:space-between">
+          <span style="font-size:8px;color:#94a3b8;font-weight:600">21:38</span>
+          <span style="font-size:8px;color:#94a3b8">📶 78</span>
+        </div>
+        <div style="padding:12px 14px 16px">
+          <!-- progress -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px">
+            <div style="width:20px;height:20px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:9px;color:#94a3b8">✕</div>
+            <div style="flex:1;height:5px;border-radius:3px;background:#eef2ff;overflow:hidden"><div style="width:4%;height:100%;background:#6366f1"></div></div>
+            <span style="font-size:8px;font-weight:700;color:#94a3b8">1/28</span>
+          </div>
+          <!-- card -->
+          <div style="background:#fff;border:1px solid #eef2ff;border-radius:18px;padding:14px 12px 18px;box-shadow:0 8px 24px rgba(99,102,241,.12);margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+              <span style="font-size:7px;font-weight:700;color:#64748b;background:#eef2ff;padding:3px 8px;border-radius:999px">HSK 4 · повтор</span>
+              <span style="font-size:7px;color:#94a3b8">↻ тап</span>
+            </div>
+            <div style="text-align:center;font-size:46px;font-weight:800;color:#1e293b;padding:14px 0">法律</div>
+          </div>
+          <!-- buttons -->
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;background:#fef2f2;border-radius:12px;padding:10px 0;text-align:center;font-size:14px;color:#ef4444">✕</div>
+            <div style="flex:1;background:#f0fdf4;border-radius:12px;padding:10px 0;text-align:center;font-size:14px;color:#22c55e">✓</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Правая часть: copy ───────────────────────── -->
+    <div style="flex:1;min-width:0">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div style="width:28px;height:28px;background:linear-gradient(135deg,#6366f1,#22d3ee);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🀄</div>
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.1em">LELE 汉卡 · карточки</div>
+      </div>
+
+      <h2 style="text-align:left;font-size:clamp(22px,3vw,40px);margin-bottom:12px;line-height:1.1">
+        Слова<br><span class="grad">сами не забываются</span>
+      </h2>
+      <p style="font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:24px;max-width:420px">
+        Личное приложение с карточками прямо в Telegram. Алгоритм интервального повторения сам показывает слово ровно перед тем, как ты его забудешь
+      </p>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);display:flex;align-items:center;justify-content:center;font-size:15px">🧠</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff">Умное повторение (FSRS)</div><div style="font-size:12px;color:var(--muted)">Запоминаешь надолго, а не зубришь перед уроком</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.2);display:flex;align-items:center;justify-content:center;font-size:15px">👆</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff">Свайп влево / вправо</div><div style="font-size:12px;color:var(--muted)">Как Quizlet, только умнее — тап переворачивает карточку</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);display:flex;align-items:center;justify-content:center;font-size:15px">📚</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff">Колода под каждый урок</div><div style="font-size:12px;color:var(--muted)">Слова с твоего занятия — сразу в карточках</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);display:flex;align-items:center;justify-content:center;font-size:15px">✈️</div>
+          <div><div style="font-size:14px;font-weight:600;color:#fff">Прямо в Telegram</div><div style="font-size:12px;color:var(--muted)">Ничего не ставить — открыл и повторяешь в очереди за кофе</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 10 — ОТЗЫВЫ -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s10">
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="cn-deco" style="bottom:-60px;right:-40px">评</div>
+
+  <div class="tag">Отзывы учеников</div>
+  <h2>Истории, после которых<br><span class="grad">хочется начать</span></h2>
+
+  <div class="cards" style="max-width:1000px;align-items:stretch">
+    <div class="card" style="display:flex;flex-direction:column;text-align:left">
+      <div style="font-size:40px;line-height:.6;color:var(--v2);font-weight:900;margin-bottom:8px">"</div>
+      <p style="font-size:13px;color:rgba(255,255,255,.82);line-height:1.6;flex:1">Начала из любопытства — смогу ли осилить такой сложный язык. Полтора года — и я уже HSK 4, летала в Китай по обмену, работаю с импортом и участвую в переговорах. Лия поддерживала даже в моменты выгорания.</p>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+        <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#22d3ee);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">ЭМ</div>
+        <div><div style="font-size:13px;font-weight:700;color:#fff">Эмми</div><div style="font-size:11px;color:var(--muted)">Ученица · 1,5 года · HSK 4</div></div>
+      </div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;text-align:left">
+      <div style="font-size:40px;line-height:.6;color:var(--v2);font-weight:900;margin-bottom:8px">"</div>
+      <p style="font-size:13px;color:rgba(255,255,255,.82);line-height:1.6;flex:1">Пошёл учить перед поездкой в Китай — а это превратилось в настоящую разгрузку между работой и семьёй. Хоть я и не самый ответственный ученик — благодаря Лие чувствую прогресс и хочу учить дальше.</p>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+        <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">ДМ</div>
+        <div><div style="font-size:13px;font-weight:700;color:#fff">Дима</div><div style="font-size:11px;color:var(--muted)">Ученик · Начинающий</div></div>
+      </div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;text-align:left">
+      <div style="font-size:40px;line-height:.6;color:var(--v2);font-weight:900;margin-bottom:8px">"</div>
+      <p style="font-size:13px;color:rgba(255,255,255,.82);line-height:1.6;flex:1">Из-за некомпетентного преподавания в универе мой уровень не поднялся ни на иероглиф. Лия всё вернула — грамотный подход, занятия с мемами и мультиками. Она искренне любит китайский и заражает этой любовью.</p>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+        <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#6366f1);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">ЭЛ</div>
+        <div><div style="font-size:13px;font-weight:700;color:#fff">Эля</div><div style="font-size:11px;color:var(--muted)">Ученица · Студентка</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 11 — ГАРАНТИЯ -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s11">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-3"></div>
+  <div class="cn-deco" style="top:-40px;right:-30px">保</div>
+
+  <span class="emoji-big">🛡️</span>
+  <div class="tag">Гарантия результата</div>
+  <h2>Доводим до сдачи HSK —<br><span class="grad">или дообучаем бесплатно</span></h2>
+  <p class="sub">Мы берём деньги не за уроки, а за результат. Поэтому риск — на нас, а не на тебе</p>
+
+  <div class="cards" style="max-width:900px;margin-top:28px">
+    <div class="card" style="text-align:center">
+      <span class="card-icon">🎯</span>
+      <h4>Готовим к экзамену</h4>
+      <p>Программа под твой уровень HSK и дату сдачи — с первого занятия знаем, куда идём</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <span class="card-icon">✅</span>
+      <h4>Допуск перед HSK</h4>
+      <p>Перед экзаменом — внутренняя проверка. Готов — идёшь сдавать уверенно</p>
+    </div>
+    <div class="card" style="text-align:center">
+      <span class="card-icon">🔁</span>
+      <h4>Не готов? Дообучаем</h4>
+      <p>Если видим, что рано — не отпускаем рисковать. Дообучаем и готовим к следующему разу. Бесплатно</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 12 — ЦЕНА -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s12">
   <div class="blob blob-2"></div>
   <div class="blob blob-3"></div>
   <div class="cn-deco" style="top:-30px;right:-20px">价</div>
@@ -1108,7 +1311,13 @@
         <div class="price-item"><span class="price-item-icon">✓</span>Домашние задания + чат с преподавателем</div>
         <div class="price-item"><span class="price-item-icon">✓</span>Запись каждого урока</div>
         <div class="price-item"><span class="price-item-icon">✓</span>Личный дашборд с прогрессом</div>
+        <div class="price-item"><span class="price-item-icon">✓</span>LELE 汉卡 — карточки слов с умным повторением</div>
         <div class="price-item"><span class="price-item-icon">✓</span>Telegram Mini App + система 汉分 (баллы за прогресс)</div>
+        <div class="price-item"><span class="price-item-icon">🛡️</span><strong style="color:#fff">Гарантия сдачи HSK</strong> — не готов, дообучаем бесплатно</div>
+      </div>
+
+      <div style="background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.3);border-radius:14px;padding:12px 16px;margin-top:4px;font-size:13px;color:#fff;line-height:1.5">
+        🎁 Решишь в течение <strong>48 часов</strong> — <strong style="color:var(--v3)">+500 汉分</strong> на старт сразу
       </div>
 
       <div class="price-divider"></div>
@@ -1122,9 +1331,48 @@
 </div>
 
 <!-- ════════════════════════════════════════════════════ -->
-<!-- SLIDE 10 — CTA -->
+<!-- SLIDE 13 — FAQ / ВОЗРАЖЕНИЯ -->
 <!-- ════════════════════════════════════════════════════ -->
-<div class="slide" id="s10">
+<div class="slide" id="s13">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="cn-deco" style="bottom:-60px;left:-40px">问</div>
+
+  <div class="tag">Частые вопросы</div>
+  <h2>Коротко о <span class="grad">важном</span></h2>
+
+  <div class="cards" style="max-width:1000px;align-items:stretch;margin-top:24px">
+    <div class="card" style="text-align:left">
+      <h4 style="margin-bottom:8px">«Дорого»</h4>
+      <p>Час индивидуально с носителем — 2–3 тыс. ₽. У нас 8 занятий + материалы + AI + 汉卡 + гарантия за 15 990 ₽. Платишь меньше за больше — и за результат.</p>
+    </div>
+    <div class="card" style="text-align:left">
+      <h4 style="margin-bottom:8px">«Не хватит времени»</h4>
+      <p>Flipped Class для этого и придуман: теория — короткими видео когда удобно, урок — 2 раза в неделю по часу. Меньше, чем сериал вечером.</p>
+    </div>
+    <div class="card" style="text-align:left">
+      <h4 style="margin-bottom:8px">«А вдруг не смогу»</h4>
+      <p>Ты уже попробовал(а) сегодня — и получилось. А дальше тебя страхует гарантия: не готов к HSK — дообучаем бесплатно. Риск на нас.</p>
+    </div>
+    <div class="card" style="text-align:left">
+      <h4 style="margin-bottom:8px">«Можно перенести занятие?»</h4>
+      <p>Да, при уведомлении за 12+ часов переносим внутри месяца. Оплаченные уроки не сгорают.</p>
+    </div>
+    <div class="card" style="text-align:left">
+      <h4 style="margin-bottom:8px">«Нужен ли опыт?»</h4>
+      <p>Нет, берём с нуля. Программа и темп подбираются под твой уровень — от 🥚 до HSK.</p>
+    </div>
+    <div class="card" style="text-align:left">
+      <h4 style="margin-bottom:8px">«Как идёт урок?»</h4>
+      <p>60 минут в Zoom: живая устная практика с преподавателем, AI подсвечивает произношение и ошибки.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- SLIDE 14 — CTA -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="slide" id="s14">
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
   <div class="blob blob-3"></div>
@@ -1134,7 +1382,7 @@
   <div class="tag">Финал</div>
   <h1>Начни прямо<br><span class="grad">сегодня</span></h1>
   <p class="sub">Место в группе держим <strong style="color:#fff">48 часов</strong><br>
-  Потом оно уходит следующему — и старт без тебя</p>
+  Решишь за это время — <strong style="color:var(--v3)">+500 汉分</strong> на старт. Потом место уходит следующему</p>
 
   <!-- stats -->
   <div style="position:relative;z-index:1;margin-top:20px;display:flex;gap:32px;flex-wrap:wrap;justify-content:center">
@@ -1195,7 +1443,7 @@
 </div>
 
 <script>
-const TOTAL = 10;
+const TOTAL = 14;
 let cur = 1;
 
 function getSlide(n){ return document.getElementById('s'+n) }
@@ -1327,12 +1575,12 @@ async function handlePay(){
 (function(){
   const p = new URLSearchParams(location.search);
   if(p.get('payment') === 'success'){
-    setTimeout(()=>{ goTo(10); }, 100);
+    setTimeout(()=>{ goTo(14); }, 100);
     const btn = document.getElementById('payBtn');
     if(btn){ btn.textContent = '✅ Оплата прошла!'; btn.style.background='rgba(34,197,94,.2)'; btn.style.color='#86efac'; }
   }
   if(p.get('payment') === 'fail'){
-    setTimeout(()=>{ goTo(10); }, 100);
+    setTimeout(()=>{ goTo(14); }, 100);
   }
 })();
 
