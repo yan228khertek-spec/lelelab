@@ -131,6 +131,12 @@
 const TG  = window.Telegram?.WebApp;
 const API = 'https://ianramzay.app.n8n.cloud/webhook';
 const CHAT_ID = TG?.initDataUnsafe?.user?.id || null;
+/* Режим «только Слово дня» — вход из канала (ссылка ?wod=1). Ученики через бота видят все колоды. */
+const WOD_ONLY = (()=>{ try{
+  const p=new URLSearchParams(location.search);
+  if(p.get('wod')==='1'||p.get('src')==='channel') return true;
+  if(TG&&TG.initDataUnsafe&&TG.initDataUnsafe.start_param==='wod') return true;
+}catch(e){} return false; })();
 const DAY = 86400000;
 
 /* ── КОЛОДЫ (ранжируются по hsk) ────────────────────────────────── */
@@ -327,7 +333,7 @@ const DECKS = [
     ]
   },
 ];
-const LVL_COLOR = {1:'#22c55e',2:'#22d3ee',3:'#3b82f6',4:'#6366f1',5:'#a855f7',6:'#ec4899'};
+const LVL_COLOR = {0:'#f59e0b',1:'#22c55e',2:'#22d3ee',3:'#3b82f6',4:'#6366f1',5:'#a855f7',6:'#ec4899'};
 
 /* ── FSRS-5 ─────────────────────────────────────────────────────── */
 const W = [0.40255,1.18385,3.173,15.69105,7.1949,0.5345,1.4604,0.0046,1.54575,
@@ -393,12 +399,17 @@ function renderHome(){
   session=null;
   const byLvl={}; DECKS.forEach(d=>{(byLvl[d.hsk]=byLvl[d.hsk]||[]).push(d);});
   const levels=Object.keys(byLvl).map(Number).sort((a,b)=>a-b);
+  const lvlsToShow = WOD_ONLY ? levels.filter(l=>l===0) : levels;
   let html=`<div class="top fade"><h1>LELE <span class="hz">汉卡</span></h1></div>
     <div class="scroll" style="flex:1;padding-bottom:30px">`;
-  for(const lvl of levels){
+  let shown=0;
+  for(const lvl of lvlsToShow){
     const col=LVL_COLOR[lvl]||'#3b82f6';
-    html+=`<div class="lvl"><span class="dot" style="background:${col}"></span>HSK ${lvl}</div>`;
-    for(const d of byLvl[lvl]){
+    const decksL=byLvl[lvl].filter(d=>!(d.id==='word-of-day'&&(!d.cards||!d.cards.length)));
+    if(!decksL.length) continue;
+    shown+=decksL.length;
+    html+=`<div class="lvl"><span class="dot" style="background:${col}"></span>${lvl===0?'📅 Ежедневное':'HSK '+lvl}</div>`;
+    for(const d of decksL){
       const due=dueCount(d), prog=deckProgress(d), pct=Math.round(prog*100);
       const CC=32*Math.PI, off=CC*(1-prog);
       html+=`<div class="deck" data-deck="${d.id}">
@@ -414,6 +425,7 @@ function renderHome(){
       </div>`;
     }
   }
+  if(!shown) html+=`<div style="text-align:center;color:#9aa0b5;padding:60px 24px;font-size:15px;line-height:1.5">${WOD_ONLY?'📅 Слово дня скоро появится.<br>Загляни чуть позже!':'Пока нет колод.'}</div>`;
   html+=`</div>`;
   app.innerHTML=html;
   app.querySelectorAll('.deck').forEach(el=>el.onclick=()=>{haptic('light');startSession(el.dataset.deck);});
@@ -552,9 +564,21 @@ function renderDone(){
 function haptic(t){ try{ const h=TG?.HapticFeedback; if(!h)return;
   if(t==='success') h.notificationOccurred('success'); else h.impactOccurred(t); }catch(e){} }
 
+/* ── Живая колода «Слово дня» (грузится с n8n) ──────────────────── */
+const WOD={ id:'word-of-day', hsk:0, lesson:0, title:'Слово дня', subtitle:'Новое слово каждый день', cards:[] };
+DECKS.unshift(WOD);
+function loadWordOfDay(){
+  fetch(API+'/lelelab/word-deck').then(r=>r.json()).then(list=>{
+    if(!Array.isArray(list)) return;
+    WOD.cards=list.map((w,i)=>({ id:'wod-'+(w.hanzi||i), hanzi:w.hanzi||'', pinyin:w.pinyin||'', ru:w.translation||'' })).filter(c=>c.hanzi);
+    renderHome();
+  }).catch(()=>{});
+}
+
 /* ── INIT ────────────────────────────────────────────────────────── */
 if(TG){ TG.ready(); TG.expand(); try{TG.setHeaderColor('#ffffff');TG.setBackgroundColor('#ffffff');}catch(e){} }
 renderHome();
+loadWordOfDay();
 </script>
 </body>
 </html>
