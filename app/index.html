@@ -35,11 +35,11 @@ const API = 'https://ianramzay.app.n8n.cloud/webhook';
 
 // ─── LEVELS ──────────────────────────────────────────────────────
 const LEVELS = [
-  { n:1, badge:'🥚', cn:'蛋',   ru:'Новичок',   min:0,    max:300  },
-  { n:2, badge:'🐣', cn:'雏',   ru:'Новенький', min:300,  max:800  },
-  { n:3, badge:'🐥', cn:'学生', ru:'Студент',   min:800,  max:2000 },
-  { n:4, badge:'🦅', cn:'达人', ru:'Мастер',    min:2000, max:5000 },
-  { n:5, badge:'🐉', cn:'大神', ru:'Гуру',      min:5000, max:5000 },
+  { n:1, badge:'🥚', cn:'蛋',   ru:'Новичок', min:0,     max:1000  },
+  { n:2, badge:'🐣', cn:'雏',   ru:'Птенец',  min:1000,  max:4000  },
+  { n:3, badge:'🐥', cn:'学生', ru:'Студент', min:4000,  max:10000 },
+  { n:4, badge:'🦅', cn:'达人', ru:'Мастер',  min:10000, max:20000 },
+  { n:5, badge:'🐉', cn:'大神', ru:'Гуру',    min:20000, max:20000 },
 ];
 function getLevel(balance) {
   for (let i = LEVELS.length-1; i >= 0; i--)
@@ -162,13 +162,7 @@ function ProgressScreen({ data }) {
   const pct = lvl.n===5 ? 100 : Math.round((s.balance-lvl.min)/(lvl.max-lvl.min)*100);
   const R=78, C0=2*Math.PI*R, dash=C0*(pct/100);
 
-  const discountTiers = [
-    {v:1000,p:'3%',  got: s.balance>=1000},
-    {v:3000,p:'5%',  got: s.balance>=3000},
-    {v:7000,p:'7%',  got: s.balance>=7000},
-    {v:12000,p:'10%',got: s.balance>=12000},
-  ];
-  const currentDiscount = discountTiers.findIndex(d=>!d.got);
+  // Скидки убраны (экономика v1.0). Награды за 汉分 — отдельным релизом.
 
   const tg = window.Telegram?.WebApp;
   const chatId = tg?.initDataUnsafe?.user?.id;
@@ -213,8 +207,8 @@ function ProgressScreen({ data }) {
             )}
             <div style={{marginTop:14,display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
               <div style={{display:'flex',flexDirection:'column',gap:2}}>
-                <span style={{fontSize:11,fontWeight:700,letterSpacing:0.6,textTransform:'uppercase',color:C.muted}}>Скидка</span>
-                <span style={{fontSize:18,fontWeight:800,color:s.discount>0?C.tealText:C.muted,fontVariantNumeric:'tabular-nums'}}>{s.discount>0?`${s.discount}%`:'—'}</span>
+                <span style={{fontSize:11,fontWeight:700,letterSpacing:0.6,textTransform:'uppercase',color:C.muted}}>Уровень</span>
+                <span style={{fontSize:18,fontWeight:800,color:C.ink}}>{lvl.ru}</span>
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:2}}>
                 <span style={{fontSize:11,fontWeight:700,letterSpacing:0.6,textTransform:'uppercase',color:C.muted}}>Место в топе</span>
@@ -229,9 +223,9 @@ function ProgressScreen({ data }) {
         {/* ── QUICK ACTIONS ── */}
         <div style={{marginTop:14,display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
           {[
-            {ico:'📝',t:'Сдать ДЗ',sub:'+30…+75',accent:C.teal,action:()=>tg?.openTelegramLink?.('https://t.me/lelehwbot')},
-            {ico:'👥',t:'Приведи друга',sub:'+1 000 汉分',accent:C.lilac,action:()=>refLink&&tg?.shareURL?.(refLink,'Учи китайский со мной в LELE LAB! 🐉')},
-            {ico:'🎓',t:'HSK',sub:'+уровень×300',accent:C.gold,action:null},
+            {ico:'📝',t:'Сдать ДЗ',sub:'+40 汉分',accent:C.teal,action:()=>tg?.openTelegramLink?.('https://t.me/lelehwbot')},
+            {ico:'👥',t:'Приведи друга',sub:'+2 000 汉分',accent:C.lilac,action:()=>refLink&&tg?.shareURL?.(refLink,'Учи китайский со мной в LELE LAB! 🐉')},
+            {ico:'🃏',t:'Карточки 汉卡',sub:'тренируй',accent:C.gold,action:()=>tg?.openTelegramLink?.('https://t.me/lelehwbot')},
           ].map((a,i)=>(
             <div key={i} onClick={a.action||undefined} style={{background:C.card,borderRadius:18,padding:'12px 10px',borderLeft:`3px solid ${a.accent}`,cursor:a.action?'pointer':'default'}}>
               <div style={{fontSize:20}}>{a.ico}</div>
@@ -262,23 +256,10 @@ function ProgressScreen({ data }) {
           </div>
         </div>
 
-        {/* ── DISCOUNT TIERS ── */}
-        <div style={{marginTop:18}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10,padding:'0 4px'}}>
-            <span style={{fontWeight:800,fontSize:14,color:C.ink}}>Твоя скидка на пакеты</span>
-            <span style={{fontSize:12,color:C.tealText,fontWeight:800}}>{s.discount>0?`сейчас ${s.discount}%`:'нет скидки'}</span>
-          </div>
-          <div style={{display:'flex',gap:8}}>
-            {discountTiers.map((d,i)=>{
-              const isCurrent = !d.got && (i===0 || discountTiers[i-1].got);
-              return (
-                <div key={i} style={{flex:1,background:d.got?C.teal:isCurrent?'#fff':C.card,border:isCurrent?`2px dashed ${C.ink}`:`1px solid ${d.got?'transparent':C.line}`,borderRadius:14,padding:'10px 4px',textAlign:'center',color:d.got?C.ink:isCurrent?C.ink:C.muted}}>
-                  <div style={{fontWeight:900,fontSize:18}}>{d.p}</div>
-                  <div style={{fontSize:10,marginTop:2,fontWeight:700,fontVariantNumeric:'tabular-nums'}}>{fmtPts(d.v)}</div>
-                </div>
-              );
-            })}
-          </div>
+        {/* ── REWARDS SOON ── */}
+        <div style={{marginTop:18,background:C.card,borderRadius:16,padding:'14px 16px'}}>
+          <div style={{fontWeight:800,fontSize:14,color:C.ink}}>🎁 Скоро: награды за 汉分</div>
+          <div style={{fontSize:12,color:C.muted,fontWeight:600,marginTop:4,lineHeight:1.45}}>Копи баллы — скоро обменяешь на бонусы, скидки и бесплатный экзамен HSK.</div>
         </div>
 
         {/* ── RECENT ── */}
