@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Оплата — LELE LAB</title>
+<meta name="description" content="Оплата пакета LELE LAB — групповой премиум, 8 занятий. Безопасная оплата через Т-Банк.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#020617;
+    --v1:#6366f1;--v2:#3b82f6;--v3:#22d3ee;
+    --white:#fff;--muted:rgba(255,255,255,.55);
+    --card:rgba(255,255,255,.04);--border:rgba(255,255,255,.1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:grid;place-items:center;padding:24px;
+    background:var(--bg);color:var(--white);
+    font-family:'Inter',system-ui,sans-serif;position:relative;overflow-x:hidden}
+  .glow{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0}
+  .g1{width:480px;height:480px;background:var(--v1);opacity:.18;top:-160px;left:-120px}
+  .g2{width:420px;height:420px;background:var(--v3);opacity:.14;bottom:-160px;right:-120px}
+  .wrap{position:relative;z-index:1;width:100%;max-width:440px}
+  .logo{font-weight:900;letter-spacing:.08em;font-size:15px;text-align:center;margin-bottom:26px;
+    background:linear-gradient(135deg,var(--v1),var(--v2),var(--v3));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:32px 26px}
+  h1{font-size:24px;font-weight:800;margin-bottom:6px;text-align:center;letter-spacing:-.01em}
+  .sub{font-size:14px;color:var(--muted);text-align:center;margin-bottom:24px;line-height:1.5}
+  .pkg{border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:22px;background:rgba(255,255,255,.02)}
+  .pkg-name{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--v3);margin-bottom:8px}
+  .pkg-price{font-size:34px;font-weight:900;line-height:1;margin-bottom:4px}
+  .pkg-meta{font-size:13px;color:var(--muted);margin-bottom:16px}
+  .pkg-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .pkg-list li{font-size:13.5px;color:rgba(255,255,255,.82);display:flex;gap:9px;align-items:flex-start;line-height:1.4}
+  .pkg-list li::before{content:'✓';color:var(--v3);font-weight:800;flex-shrink:0}
+  #ofertaLabel{display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:13px 15px;border-radius:12px;
+    border:1px solid var(--border);background:rgba(255,255,255,.03);transition:border-color .2s;margin-bottom:16px}
+  #ofertaCheck{width:16px;height:16px;margin-top:2px;accent-color:var(--v3);flex-shrink:0;cursor:pointer}
+  .oferta-text{font-size:12.5px;color:var(--muted);line-height:1.55}
+  .oferta-text a{color:var(--v3);text-decoration:underline;text-underline-offset:2px}
+  #payBtn{width:100%;padding:17px;border-radius:999px;border:none;cursor:not-allowed;
+    background:rgba(255,255,255,.1);color:rgba(255,255,255,.3);
+    font-size:17px;font-weight:700;font-family:'Inter',sans-serif;transition:all .3s}
+  .secure{font-size:12px;color:var(--muted);text-align:center;margin-top:15px;line-height:1.6}
+  .secure a{color:var(--v3);text-decoration:none}
+  .pay-cta{display:inline-block;margin-top:18px;padding:14px 28px;border-radius:999px;
+    background:linear-gradient(135deg,var(--v1),var(--v2),var(--v3));color:#fff;font-weight:700;
+    text-decoration:none;font-size:15px}
+</style>
+</head>
+<body>
+<div class="glow g1"></div>
+<div class="glow g2"></div>
+
+<div class="wrap">
+  <div class="logo">LELE LAB 乐乐</div>
+  <div class="card" id="card">
+    <h1>Оформление</h1>
+    <div class="sub">Безопасная оплата картой через Т-Банк</div>
+
+    <div class="pkg">
+      <div class="pkg-name">Групповой премиум</div>
+      <div class="pkg-price">15 990 ₽</div>
+      <div class="pkg-meta">8 занятий · группа до 4 человек · ~2 урока в неделю</div>
+      <ul class="pkg-list">
+        <li>Живые уроки с преподавателем</li>
+        <li>Домашние задания и их проверка</li>
+        <li>Авторские материалы и записи уроков</li>
+        <li>Чат с преподавателем между уроками</li>
+      </ul>
+    </div>
+
+    <label id="ofertaLabel">
+      <input type="checkbox" id="ofertaCheck" onchange="togglePayBtn()">
+      <span class="oferta-text">Я принимаю условия
+        <a href="/oferta.html" target="_blank">оферты</a> и
+        <a href="/privacy.html" target="_blank">политики конфиденциальности</a></span>
+    </label>
+
+    <button id="payBtn" disabled onclick="handlePay()">Оплатить 15 990 ₽</button>
+
+    <div class="secure">🔒 Платёж защищён Т-Банк · Вопросы? <a href="https://t.me/lelelabinfo" target="_blank">@lelelabinfo</a></div>
+  </div>
+</div>
+
+<script>
+function togglePayBtn(){
+  var checked = document.getElementById('ofertaCheck').checked;
+  var btn = document.getElementById('payBtn');
+  var label = document.getElementById('ofertaLabel');
+  if(checked){
+    btn.disabled = false; btn.style.cursor = 'pointer';
+    btn.style.background = 'linear-gradient(135deg,var(--v1),var(--v2),var(--v3))';
+    btn.style.color = '#fff'; btn.style.boxShadow = '0 8px 32px rgba(99,102,241,.4)';
+    label.style.borderColor = 'rgba(34,211,238,.35)';
+  } else {
+    btn.disabled = true; btn.style.cursor = 'not-allowed';
+    btn.style.background = 'rgba(255,255,255,.1)'; btn.style.color = 'rgba(255,255,255,.3)';
+    btn.style.boxShadow = 'none'; label.style.borderColor = 'rgba(255,255,255,.1)';
+  }
+}
+
+var PROXY_URL = 'https://ianramzay.app.n8n.cloud/webhook/lelelab/tbank-init';
+var AMOUNT = 1599000; // 15 990 ₽ в копейках
+
+async function handlePay(){
+  if(!document.getElementById('ofertaCheck').checked) return;
+  var btn = document.getElementById('payBtn');
+  btn.disabled = true; btn.textContent = '⏳ Создаём платёж...'; btn.style.opacity = '0.7';
+  try {
+    var orderId = 'LELE-GROUP-' + Date.now();
+    var res = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: AMOUNT,
+        description: 'LELE LAB — Групповой премиум, 8 занятий',
+        orderId: orderId,
+        successUrl: window.location.origin + '/pay.html?payment=success&order=' + orderId,
+        failUrl: window.location.origin + '/pay.html?payment=fail&order=' + orderId
+      })
+    });
+    var rawText = await res.text();
+    if(!rawText) throw new Error('Нет ответа от сервера');
+    var data = JSON.parse(rawText);
+    if(data.success && data.paymentUrl){
+      window.location.href = data.paymentUrl;
+    } else {
+      throw new Error(data.error || 'Ошибка создания платежа');
+    }
+  } catch(e){
+    btn.textContent = '❌ ' + e.message; btn.style.opacity = '1';
+    btn.style.background = 'rgba(239,68,68,.2)'; btn.style.color = '#fca5a5'; btn.style.boxShadow = 'none';
+    setTimeout(function(){
+      btn.textContent = 'Оплатить 15 990 ₽'; btn.disabled = false;
+      btn.style.background = 'linear-gradient(135deg,var(--v1),var(--v2),var(--v3))';
+      btn.style.color = '#fff'; btn.style.boxShadow = '0 8px 32px rgba(99,102,241,.4)'; btn.style.opacity = '1';
+    }, 3000);
+  }
+}
+
+// Результат после редиректа из Т-Банка
+(function(){
+  var p = new URLSearchParams(location.search);
+  if(p.get('payment') === 'success'){
+    document.getElementById('card').innerHTML =
+      '<div style="text-align:center;padding:14px 0">' +
+      '<div style="font-size:54px;margin-bottom:14px">✅</div>' +
+      '<h1>Оплата прошла!</h1>' +
+      '<div class="sub" style="margin-top:8px">Спасибо! Мы получили оплату и активируем твой пакет в ближайшее время. Если есть вопросы — напиши нам.</div>' +
+      '<a class="pay-cta" href="https://t.me/lelelabinfo" target="_blank">Написать нам</a>' +
+      '</div>';
+  }
+  if(p.get('payment') === 'fail'){
+    var b = document.getElementById('payBtn');
+    if(b){ b.textContent = 'Оплата не прошла — попробовать снова'; }
+  }
+})();
+</script>
+</body>
+</html>
